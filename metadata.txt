@@ -1,0 +1,15 @@
+[general]
+name=GeoZONE
+email=mcazzaro@izsvenezie.it
+author=Mirco Cazzaro
+qgisMinimumVersion=3.0
+description=This plugins loads a shape file related to administrative
+    subdivision of a certain country or region.
+    Then, it creates a layer named 'GeoZONE_layer'.
+    Finally, it prompts a dialog to insert some metadata.
+about=This projects serves in a project defined according to the 
+    WOAH Terrestrial Code Chapter - Zoning and compartmentalisation 
+    (WOAH – Terrestrial Animal Health Code, 2023).
+version=1.0
+tracker=http://bugs.itopen.it
+repository=http://www.itopen.it/repo
