@@ -76,8 +76,8 @@ class GeoZONEDialog(QDialog):
         if not os.path.exists(home + '/GeoZONE'):
             os.makedirs(home + '/GeoZONE')
 
-        curDate = QDate.currentDate().toString("yyyy-MM-dd")
-        file_path = home + "/GeoZONE/metadata" + curDate + ".json"
+        
+        file_path = home + "/GeoZONE/metadata.json"
         with open(file_path, "w") as json_file:
             json.dump(data, json_file, indent=2)
 

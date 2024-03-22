@@ -176,7 +176,7 @@ class GeoZONE:
         if result == QDialog.Accepted:
             pass
 
-        files_to_zip = [home + "/GeoZONE/GeoZONE" + curDate + ".shp", home + "/GeoZONE/GeoZONE" + curDate + ".shx", home + "/GeoZONE/GeoZONE" + curDate + ".cpg", home + "/GeoZONE/GeoZONE" + curDate + ".dbf", home + "/GeoZONE/GeoZONE" + curDate + ".prj", home + "/GeoZONE/metadata" + curDate + ".json"]
+        files_to_zip = [home + "/GeoZONE/GeoZONE" + curDate + ".shp", home + "/GeoZONE/GeoZONE" + curDate + ".shx", home + "/GeoZONE/GeoZONE" + curDate + ".cpg", home + "/GeoZONE/GeoZONE" + curDate + ".dbf", home + "/GeoZONE/GeoZONE" + curDate + ".prj", home + "/GeoZONE/metadata.json"]
         zip_filename = home + "/GeoZONE/GeoZONE" + curDate + ".zip"
 
         with zipfile.ZipFile(zip_filename, 'w') as zip_file:
