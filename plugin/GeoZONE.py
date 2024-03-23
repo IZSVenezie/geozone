@@ -9,6 +9,7 @@ import os
 import uuid
 import zipfile
 import subprocess
+from datetime import datetime
 
 class GeoZONE:
     def __init__(self, iface):
@@ -50,9 +51,12 @@ class GeoZONE:
                 # Check if geometries from the GeoZONE_Layer are selected
                 selected_features = geozone_layer.selectedFeatures()
                 if selected_features:
-                    flag = 1
-                    # Prompt custom dialog for editing attributes
-                    self.edit_attributes_dialog(geozone_layer, selected_features)
+                    if len(selected_features) == 1:
+                        flag = 1
+                        # Prompt custom dialog for editing attributes
+                        self.edit_attributes_dialog(geozone_layer, selected_features)
+                    else:
+                        self.save_layer_with_metadata(geozone_layer, flag)
                 continue
 
             # Get selected features from each layer
@@ -66,7 +70,12 @@ class GeoZONE:
         # If no geometry is selected, save the GeoZONE_Layer and prompt for metadata
         #if not geozone_layer.selectedFeatures():
         if flag == 0:
-            self.save_layer_with_metadata(geozone_layer, flag)
+            pass #old save_layer_with_metadata callpoint (was exporting all GeoZONE features)
+            
+
+    
+    
+    ################################################ LOAD GEOZONE (load/create db shp) ###############################################
 
     def create_empty_layer(self):
         # Default location for GeoZONE_Layer
@@ -130,6 +139,10 @@ class GeoZONE:
         QgsMessageLog.logMessage("GeoZONE_Layer opened successfully.", "GeoZONE", Qgis.Info)
         QMessageBox.information(None, "Information", "GeoZONE_Layer opened successfully.")
 
+
+
+    ################################################ IMPORT GEOMETRIES (from other layers) ###############################################
+
     def copy_selected_geometries(self, layer, selected_features):
         # Check if GeoZONE_Layer exists, if not, create it
         existing_layers = QgsProject.instance().mapLayersByName("GeoZONE_Layer")
@@ -155,6 +168,10 @@ class GeoZONE:
 
         QgsMessageLog.logMessage("Selected geometries copied to GeoZONE_Layer", "GeoZONE", Qgis.Info)
 
+
+
+    ################################################ SAVE LAYER (selected geometries) ###############################################
+
     def save_layer_with_metadata(self, layer, flag):
         # Save the layer to the specified path
         curDate = QDate.currentDate().toString("yyyy-MM-dd")
@@ -163,7 +180,7 @@ class GeoZONE:
             os.makedirs(home + '/GeoZONE')
         save_path = home + "/GeoZONE/GeoZONE" + curDate + ".shp"
 
-        QgsVectorFileWriter.writeAsVectorFormat(layer, save_path, "utf-8", layer.crs(), "ESRI Shapefile")
+        QgsVectorFileWriter.writeAsVectorFormat(layer, save_path, "utf-8", layer.crs(), "ESRI Shapefile", onlySelected = True)
 
         # Display a confirmation message
         QgsMessageLog.logMessage("Layer saved successfully to {}".format(save_path), "GeoZONE", Qgis.Info)
@@ -177,7 +194,9 @@ class GeoZONE:
             pass
 
         files_to_zip = [home + "/GeoZONE/GeoZONE" + curDate + ".shp", home + "/GeoZONE/GeoZONE" + curDate + ".shx", home + "/GeoZONE/GeoZONE" + curDate + ".cpg", home + "/GeoZONE/GeoZONE" + curDate + ".dbf", home + "/GeoZONE/GeoZONE" + curDate + ".prj", home + "/GeoZONE/metadata.json"]
-        zip_filename = home + "/GeoZONE/GeoZONE" + curDate + ".zip"
+        current_timestamp = datetime.now()
+        formatted_timestamp = current_timestamp.strftime('%Y%m%d_%H%M%S')
+        zip_filename = home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".zip"
 
         with zipfile.ZipFile(zip_filename, 'w') as zip_file:
             for file_to_zip in files_to_zip:
@@ -196,7 +215,7 @@ class GeoZONE:
             print(f'Failed to open the folder. Please navigate to {target_folder} manually.')
 
 
-    #################################################################EDIT DIALOG
+    #################################### EDIT DIALOG ###############################
             
     def edit_attributes_dialog(self, layer, selected_features):
         for feature in selected_features:
