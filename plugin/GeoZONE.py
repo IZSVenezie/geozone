@@ -205,11 +205,12 @@ class GeoZONE:
 
     def save_layer_with_metadata(self, layer, flag):
         # Save the layer to the specified path
-        curDate = QDate.currentDate().toString("yyyy-MM-dd")
+        current_timestamp = datetime.now()
+        formatted_timestamp = current_timestamp.strftime('%Y%m%d_%H%M%S')
         home = expanduser("~")
         if not os.path.exists(home + '/GeoZONE'):
             os.makedirs(home + '/GeoZONE')
-        save_path = home + "/GeoZONE/GeoZONE" + curDate + ".shp"
+        save_path = home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".shp"
 
         QgsVectorFileWriter.writeAsVectorFormat(layer, save_path, "utf-8", layer.crs(), "ESRI Shapefile", onlySelected = True)
 
@@ -224,9 +225,7 @@ class GeoZONE:
         if result == QDialog.Accepted:
             pass
 
-        files_to_zip = [home + "/GeoZONE/GeoZONE" + curDate + ".shp", home + "/GeoZONE/GeoZONE" + curDate + ".shx", home + "/GeoZONE/GeoZONE" + curDate + ".cpg", home + "/GeoZONE/GeoZONE" + curDate + ".dbf", home + "/GeoZONE/GeoZONE" + curDate + ".prj", home + "/GeoZONE/metadata.json"]
-        current_timestamp = datetime.now()
-        formatted_timestamp = current_timestamp.strftime('%Y%m%d_%H%M%S')
+        files_to_zip = [home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".shp", home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".shx", home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".cpg", home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".dbf", home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".prj", home + "/GeoZONE/metadata.json"]
         zip_filename = home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".zip"
 
         with zipfile.ZipFile(zip_filename, 'w') as zip_file:
