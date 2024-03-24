@@ -86,6 +86,7 @@ class GeoZONEEditDialog(QDialog):
     def get_edited_attributes(self):
         edited_attributes = {}
 
+
         for field_name, line_edit in self.attribute_widgets.items():
             if field_name == "localid":
                 edited_attributes[field_name] = line_edit.text()
@@ -109,8 +110,5 @@ class GeoZONEEditDialog(QDialog):
         # Update the feature attributes
         for field_name, edited_value in edited_attributes.items():
             self.feature[field_name] = edited_value
-
-        # Save the changes to the data provider of the layer
-        self.layer.dataProvider().changeAttributeValues({self.feature.id(): edited_attributes})
 
         return edited_attributes
