@@ -20,10 +20,14 @@ class GeoZONEEditDialog(QDialog):
         for field in self.feature.fields():
             if field.name() not in ['optype', 'uuid']:
                 label = QLabel(field.name())
-                #line_edit = QLineEdit(str(self.feature[field.name()])) #TEXTFIELD
-                #self.attribute_widgets[field.name()] = line_edit #TEXTFIELD       
 
-                if field.name() in ["datebegin", "dateend"]:
+                if field.name() == "localid":
+                    line_edit = QLineEdit(str(self.feature[field.name()])) #TEXTFIELD
+                    layout.addWidget(label, row, col)
+                    layout.addWidget(line_edit, row, col + 1)
+                    self.attribute_widgets[field.name()] = line_edit #TEXTFIELD       
+
+                elif field.name() in ["datebegin", "dateend"]:
                     layout.addWidget(label, row, col)
                     date_edit = QDateEdit()
                     date_edit.setCalendarPopup(True)  # Enable calendar popup for easier date selection
@@ -83,7 +87,9 @@ class GeoZONEEditDialog(QDialog):
         edited_attributes = {}
 
         for field_name, line_edit in self.attribute_widgets.items():
-            if field_name in ["datebegin", "dateend"]:
+            if field_name == "localid":
+                edited_attributes[field_name] = line_edit.text()
+            elif field_name in ["datebegin", "dateend"]:
                 edited_attributes[field_name] = line_edit.date()
             elif field_name in ["s_avian", "s_bee", "s_bovine", "s_equine", "s_lago", "s_sh_go", "s_swine", "s_other", "s_wild", "m_dest", "m_surv_w", "m_surv_o", "m_trace", "m_stpout", "m_zoning", "m_movctrl", "m_quarant", "m_vectctrl", "m_selkill", "m_screen", "m_vacc"]:
                 bit_val = 0
