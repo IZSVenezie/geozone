@@ -269,7 +269,7 @@ class GeoZONE:
         if feature["optype"] != "create":
             feature["optype"] = "update"
         
-        feature["uuid"] = str(uuid.uuid4())
+        feature["uuid"] = str(uuid.uuid4()) ################### HERE WE MISS THE SEED!!
         
         # Update the feature in the data provider
         layer.updateFeature(feature)
