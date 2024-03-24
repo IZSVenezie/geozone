@@ -70,7 +70,8 @@ class GeoZONE:
         # If no geometry is selected, save the GeoZONE_Layer and prompt for metadata
         #if not geozone_layer.selectedFeatures():
         if flag == 0:
-            pass #old save_layer_with_metadata callpoint (was exporting all GeoZONE features)
+            QMessageBox.information(None, "Information", "No operation. Select the feature you want to edit or the features you want to export in order to continue.")
+            #old save_layer_with_metadata callpoint (was exporting all GeoZONE features)
             
 
     
