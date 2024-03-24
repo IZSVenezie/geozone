@@ -23,6 +23,7 @@ class GeoZONEEditDialog(QDialog):
 
                 if field.name() == "localid":
                     line_edit = QLineEdit(str(self.feature[field.name()])) #TEXTFIELD
+                    line_edit.setMaxLength(50)
                     layout.addWidget(label, row, col)
                     layout.addWidget(line_edit, row, col + 1)
                     self.attribute_widgets[field.name()] = line_edit #TEXTFIELD       
