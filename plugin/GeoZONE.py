@@ -192,7 +192,8 @@ class GeoZONE:
             new_feature.setGeometry(feature.geometry())
             #new_feature.setAttributes(feature.attributes())
             new_feature["optype"] = "create"
-            new_feature["uuid"] = str(uuid.uuid4())
+            new_feature["uuid"] = "" #str(uuid.uuid4())
+            new_feature["localid"] = ""
             geozone_layer_data.addFeature(new_feature)
 
         geozone_layer.commitChanges()
@@ -267,6 +268,8 @@ class GeoZONE:
 
         if feature["optype"] != "create":
             feature["optype"] = "update"
+        
+        feature["uuid"] = str(uuid.uuid4())
         
         # Update the feature in the data provider
         layer.updateFeature(feature)
