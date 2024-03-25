@@ -39,9 +39,9 @@ class GeoZONE:
 
     def initGui(self):
         # Create a menu entry if it doesn't exist
-        self.menu = self.iface.mainWindow().findChild(QMenu, '&Plugins')
+        self.menu = self.iface.mainWindow().findChild(QMenu, '&GeoZONE')
         if not self.menu:
-            self.menu = QMenu('&Plugins', self.iface.mainWindow().menuBar())
+            self.menu = QMenu('&GeoZONE', self.iface.mainWindow().menuBar())
             self.iface.mainWindow().menuBar().addMenu(self.menu)
 
         icon_path = 'logo.png'
