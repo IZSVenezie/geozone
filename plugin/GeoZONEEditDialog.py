@@ -52,7 +52,7 @@ class GeoZONEEditDialog(QDialog):
                         options = ["INACCURATE", "ACCURATE"]
                     
                     elif field.name() == "status":
-                        options = ["PROPOSED", "OFFICIALY RECOGNIZED"]
+                        options = ["PROPOSED", "OFFICIALY RECOGNIZED", "SELF DECLARATION"]
                     
                     elif field.name() == "subtype":
                         options = ["NEGLIGIBLE RISK", "CONTROLLED RISK"]
@@ -113,8 +113,10 @@ class GeoZONEEditDialog(QDialog):
             elif field_name == "status":
                 if line_edit.currentText() == "PROPOSED":
                     edited_attributes[field_name] = 1
-                else:
+                elif line_edit.currentText() == "OFFICIALY RECOGNIZED":
                     edited_attributes[field_name] = 2
+                else:
+                    edited_attributes[field_name] = 3
             elif field_name == "subtype":
                 if line_edit.currentText() == "NEGLIGIBLE RISK":
                     edited_attributes[field_name] = 1
