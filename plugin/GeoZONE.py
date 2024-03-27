@@ -10,6 +10,7 @@ import uuid
 import zipfile
 import subprocess
 from datetime import datetime
+import hashlib
 
 class CustomDialog(QDialog):
     def __init__(self, parent=None):
@@ -271,7 +272,7 @@ class GeoZONE:
         if feature["optype"] != "create":
             feature["optype"] = "update"
         
-        feature["uuid"] = str(uuid.uuid4()) ################### HERE WE MISS THE SEED!!
+        feature["uuid"] = self.generate_uuid4_string(str(feature["localid"]) + str(feature["countryf"]) + str(feature["zonetype"]) + str(feature["disease"]))
         
         # Update the feature in the data provider
         layer.updateFeature(feature)
@@ -281,3 +282,18 @@ class GeoZONE:
 
         # Update the layer's fields
         layer.updateFields()
+
+    ##########################################
+        
+    def generate_uuid4_string(self, string):
+        # Generate MD5 hash of the input string
+        hash = hashlib.md5(string.encode()).hexdigest()
+        
+        # Construct the UUID4 string
+        uuid4 = f"{hash[:8]}-" \
+                f"{hash[8:12]}-" \
+                f"{hash[12:15]}-" \
+                f"{hex(int(hash[16], 16) & 0x3 | 0x8)[2]}{hash[17:20]}-" \
+                f"{hash[20:32]}"
+        
+        return uuid4
