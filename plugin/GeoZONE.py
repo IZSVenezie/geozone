@@ -1,7 +1,7 @@
 from qgis.PyQt.QtGui import QIcon
 from PyQt5.QtCore import QVariant, QDate
 from qgis.PyQt.QtWidgets import QAction, QMenu, QFileDialog, QMessageBox, QDialog, QVBoxLayout, QLabel, QPushButton
-from qgis.core import QgsVectorLayer, QgsProject, QgsField, QgsFields, QgsVectorFileWriter, QgsMessageLog, Qgis, QgsFeature
+from qgis.core import QgsVectorLayer, QgsRasterLayer, QgsProject, QgsField, QgsFields, QgsVectorFileWriter, QgsMessageLog, Qgis, QgsFeature
 from .GeoZONE_dialog import GeoZONEDialog
 from .GeoZONEEditDialog import GeoZONEEditDialog
 from os.path import expanduser
@@ -68,34 +68,36 @@ class GeoZONE:
         
         # Iterate through all opened layers
         for layer_id, layer in QgsProject.instance().mapLayers().items():
-            # Skip GeoZONE_Layer itself
-            if layer_id == geozone_layer.id():
-                # Check if geometries from the GeoZONE_Layer are selected
-                selected_features = geozone_layer.selectedFeatures()
-                if selected_features:
-                    if len(selected_features) == 1:
+            if isinstance(layer, QgsRasterLayer): 
+                pass
+            else:
+                # Skip GeoZONE_Layer itself
+                if layer_id == geozone_layer.id():
+                    # Check if geometries from the GeoZONE_Layer are selected
+                    selected_features = geozone_layer.selectedFeatures()
+                    if selected_features:
                         flag = 1
-                        dialog = CustomDialog(None)
-                        if dialog.exec_() == QDialog.Accepted:
-                            if dialog.result == "edit":
-                                # User chose to edit attributes
-                                self.edit_attributes_dialog(geozone_layer, selected_features)
-                            elif dialog.result == "export":
-                                # User chose to export the selected feature
-                                flag = 1
-                                self.save_layer_with_metadata(geozone_layer, flag)
-                        # Prompt custom dialog for editing attributes
-                    else:
-                        self.save_layer_with_metadata(geozone_layer, flag)
-                continue
+                        if len(selected_features) == 1:
+                            dialog = CustomDialog(None)
+                            if dialog.exec_() == QDialog.Accepted:
+                                if dialog.result == "edit":
+                                    # User chose to edit attributes
+                                    self.edit_attributes_dialog(geozone_layer, selected_features)
+                                elif dialog.result == "export":
+                                    # User chose to export the selected feature
+                                    self.save_layer_with_metadata(geozone_layer, flag)
+                            # Prompt custom dialog for editing attributes
+                        else:
+                            self.save_layer_with_metadata(geozone_layer, flag)
+                    continue
 
-            # Get selected features from each layer
-            selected_features = layer.selectedFeatures()
+                # Get selected features from each layer
+                selected_features = layer.selectedFeatures()
 
-            if selected_features:
-                flag = 1
-                # If geometries are selected, copy them to GeoZONE_Layer
-                self.copy_selected_geometries(geozone_layer, selected_features)
+                if selected_features:
+                    flag = 1
+                    # If geometries are selected, copy them to GeoZONE_Layer
+                    self.copy_selected_geometries(geozone_layer, selected_features)
 
         # If no geometry is selected, save the GeoZONE_Layer and prompt for metadata
         #if not geozone_layer.selectedFeatures():
