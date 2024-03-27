@@ -252,7 +252,7 @@ class GeoZONE:
 
         # Update optype field of each feature to "noaction"
         layer.startEditing()
-        for feature in layer.getFeatures():
+        for feature in layer.selectedFeatures():
             layer.changeAttributeValue(feature.id(), layer.fields().indexFromName("optype"), "noaction")
         layer.commitChanges()
         
