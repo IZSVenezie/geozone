@@ -66,6 +66,13 @@ class GeoZONE:
 
         # Get the GeoZONE_Layer
         geozone_layer = QgsProject.instance().mapLayersByName("GeoZONE_Layer")[0]
+
+        geozone_layer.startEditing()
+        for feature in geozone_layer.getFeatures():
+            if not feature["optype"]:
+                feature["optype"] = "insert"
+                geozone_layer.updateFeature(feature)
+        geozone_layer.commitChanges()        
         
         # Iterate through all opened layers
         for layer_id, layer in QgsProject.instance().mapLayers().items():
@@ -194,7 +201,7 @@ class GeoZONE:
             new_feature = QgsFeature(layer.fields())
             new_feature.setGeometry(feature.geometry())
             #new_feature.setAttributes(feature.attributes())
-            new_feature["optype"] = "create"
+            new_feature["optype"] = "insert"
             new_feature["uuid"] = "" #str(uuid.uuid4())
             new_feature["localid"] = ""
             geozone_layer_data.addFeature(new_feature)
@@ -243,6 +250,12 @@ class GeoZONE:
         
         target_folder = os.path.dirname(os.path.abspath(zip_filename))
 
+        # Update optype field of each feature to "noaction"
+        layer.startEditing()
+        for feature in layer.getFeatures():
+            layer.changeAttributeValue(feature.id(), layer.fields().indexFromName("optype"), "noaction")
+        layer.commitChanges()
+        
         try:
             subprocess.run(['explorer', target_folder], check=True)
         except subprocess.CalledProcessError:
@@ -269,7 +282,9 @@ class GeoZONE:
         for key, value in edited_attributes.items():
             feature[key] = value
 
-        if feature["optype"] != "create":
+        
+
+        if feature["optype"] != "insert":
             feature["optype"] = "update"
         
         feature["uuid"] = self.generate_uuid4_string(str(feature["localid"]) + str(feature["countryf"]) + str(feature["zonetype"]) + str(feature["disease"]))
