@@ -26,22 +26,56 @@ class GeoZONEEditDialog(QDialog):
         species_group_box.setLayout(species_layout)
         layout.addWidget(species_group_box)
 
-        # Group "methodologies" label and fields
-        methodologies_group_box = QGroupBox("Methodologies")
-        methodologies_layout = QFormLayout()
-        methodologies_group_box.setLayout(methodologies_layout)
-        layout.addWidget(methodologies_group_box)
+        # Group "measures" label and fields
+        measures_group_box = QGroupBox("Measures")
+        measures_layout = QFormLayout()
+        measures_group_box.setLayout(measures_layout)
+        layout.addWidget(measures_group_box)
 
-        group_counters = {'general': 0, 'species': 0, 'methodologies': 0}
+        group_counters = {'general': 0, 'species': 0, 'measures': 0}
+
+        label_dict = {
+            "countryf": "Country from",
+            "localid": "Local ID",
+            "accuracy": "Accuracy",
+            "zonetype": "Zone type",
+            "subtype": "Zone subtype",
+            "status": "Zone status",
+            "disease": "Disease",
+            "datebegin": "From",
+            "dateend": "To",
+            "s_avian": "Avian species",
+            "s_bee": "Bees",
+            "s_bovine": "Bovines",
+            "s_equine": "Equines",
+            "s_lago": "Lagomorphs",
+            "s_sh_go": "Sheeps/Goats",
+            "s_swine": "Swines",
+            "s_other": "Other species",
+            "s_wild": "Wild species",
+            "m_dest": "Official destruction of animal products",
+            "m_surv_w": "Surveillance within the restricted zone",
+            "m_surv_o": "Surveillance outside the restricted zone",
+            "m_trace": "Traceability",
+            "m_stpout": "Stamping out",
+            "m_zoning": "Zoning",
+            "m_movctrl": "Movement control",
+            "m_quarant": "Quarantine",
+            "m_vectctrl": "Vector surveillance",
+            "m_selkill": "Selective killing and disposal",
+            "m_screen": "Screening",
+            "m_vacc": "Vaccination during outbreak(s)"
+
+        }
 
         for field in self.feature.fields():
             if field.name() not in ['optype', 'uuid']:
-                label = QLabel(field.name())
+                label = QLabel(label_dict[field.name()])
 
                 if field.name() == "localid":
                     line_edit = QLineEdit(str(self.feature[field.name()]))
                     line_edit.setMaxLength(50)
-                    group_layout = self._get_group_layout(field, general_layout, species_layout, methodologies_layout, group_counters)
+                    group_layout = self._get_group_layout(field, general_layout, species_layout, measures_layout, group_counters)
                     group_layout.addRow(label, line_edit)
                     self.attribute_widgets[field.name()] = line_edit
 
@@ -49,7 +83,7 @@ class GeoZONEEditDialog(QDialog):
                     date_edit = QDateEdit()
                     date_edit.setCalendarPopup(True)
                     date_edit.setDate(QDate.currentDate())
-                    group_layout = self._get_group_layout(field, general_layout, species_layout, methodologies_layout, group_counters)
+                    group_layout = self._get_group_layout(field, general_layout, species_layout, measures_layout, group_counters)
                     group_layout.addRow(label, date_edit)
                     self.attribute_widgets[field.name()] = date_edit
 
@@ -57,7 +91,7 @@ class GeoZONEEditDialog(QDialog):
                     options = self._get_combo_box_options(field)
                     combo_box = QComboBox()
                     combo_box.addItems(options)
-                    group_layout = self._get_group_layout(field, general_layout, species_layout, methodologies_layout, group_counters)
+                    group_layout = self._get_group_layout(field, general_layout, species_layout, measures_layout, group_counters)
                     group_layout.addRow(label, combo_box)
                     self.attribute_widgets[field.name()] = combo_box
 
@@ -67,7 +101,7 @@ class GeoZONEEditDialog(QDialog):
         button_box.rejected.connect(self.reject)
         layout.addWidget(button_box)
 
-    def _get_group_layout(self, field, general_layout, species_layout, methodologies_layout, group_counters):
+    def _get_group_layout(self, field, general_layout, species_layout, measures_layout, group_counters):
         if group_counters['general'] < 9:
             group_counters['general'] += 1
             return general_layout
@@ -75,8 +109,8 @@ class GeoZONEEditDialog(QDialog):
             group_counters['species'] += 1
             return species_layout
         else:
-            group_counters['methodologies'] += 1
-            return methodologies_layout
+            group_counters['measures'] += 1
+            return measures_layout
 
     def _get_combo_box_options(self, field):
         if field.name() in ["s_avian", "s_bee", "s_bovine", "s_equine", "s_lago", "s_sh_go", "s_swine", "s_other", "s_wild", "m_dest", "m_surv_w", "m_surv_o", "m_trace", "m_stpout", "m_zoning", "m_movctrl", "m_quarant", "m_vectctrl", "m_selkill", "m_screen", "m_vacc"]:
