@@ -1,7 +1,7 @@
 from qgis.PyQt.QtGui import QIcon
-from PyQt5.QtCore import QVariant, QDate
-from qgis.PyQt.QtWidgets import QAction, QMenu, QFileDialog, QMessageBox, QDialog, QVBoxLayout, QLabel, QPushButton
-from qgis.core import QgsVectorLayer, QgsRasterLayer, QgsProject, QgsField, QgsFields, QgsVectorFileWriter, QgsMessageLog, Qgis, QgsFeature
+from PyQt5.QtCore import QVariant, QSettings
+from qgis.PyQt.QtWidgets import QAction, QMenu, QMessageBox, QDialog, QVBoxLayout, QLabel, QPushButton
+from qgis.core import QgsVectorLayer, QgsRasterLayer, QgsProject, QgsField, QgsFields, QgsVectorFileWriter, QgsMessageLog, Qgis, QgsFeature, QgsMapLayerStyle
 from .GeoZONE_dialog import GeoZONEDialog
 from .GeoZONEEditDialog import GeoZONEEditDialog
 from os.path import expanduser
@@ -50,6 +50,7 @@ class GeoZONE:
         self.action = QAction(QIcon(icon_path), "GeoZONE", self.iface.mainWindow())
         self.action.triggered.connect(self.run_plugin)
         self.menu.addAction(self.action)
+
 
 
     def unload(self):
@@ -120,6 +121,7 @@ class GeoZONE:
 
     def create_empty_layer(self):
         # Default location for GeoZONE_Layer
+        layer = None
         home = expanduser("~")
         default_layer_path = os.path.join(home, 'geozone.shp')
 
@@ -172,6 +174,11 @@ class GeoZONE:
 
             # Save the layer to the default position
             QgsVectorFileWriter.writeAsVectorFormat(layer, default_layer_path, "utf-8", layer.crs(), "ESRI Shapefile")
+
+
+        sld_path = os.path.join(os.path.dirname(__file__), "sld_geozone.sld")
+        layer.loadSldStyle(sld_path)
+
 
         # Add the layer to the map canvas
         QgsProject.instance().addMapLayer(layer)
