@@ -37,6 +37,7 @@ class GeoZONEEditDialog(QDialog):
         label_dict = {
             "countryf": "Country from",
             "localid": "Local ID",
+            "geoname": "Geographical name",
             "accuracy": "Accuracy",
             "zonetype": "Zone type",
             "subtype": "Zone subtype",
@@ -72,7 +73,7 @@ class GeoZONEEditDialog(QDialog):
             if field.name() not in ['optype', 'uuid']:
                 label = QLabel(label_dict[field.name()])
 
-                if field.name() == "localid":
+                if field.name() in ["localid", "geoname"]:
                     line_edit = QLineEdit(str(self.feature[field.name()]))
                     line_edit.setMaxLength(50)
                     group_layout = self._get_group_layout(field, general_layout, species_layout, measures_layout, group_counters)
@@ -102,7 +103,7 @@ class GeoZONEEditDialog(QDialog):
         layout.addWidget(button_box)
 
     def _get_group_layout(self, field, general_layout, species_layout, measures_layout, group_counters):
-        if group_counters['general'] < 9:
+        if group_counters['general'] < 10:
             group_counters['general'] += 1
             return general_layout
         elif group_counters['species'] < 9:
@@ -135,7 +136,7 @@ class GeoZONEEditDialog(QDialog):
 
 
         for field_name, line_edit in self.attribute_widgets.items():
-            if field_name == "localid":
+            if field_name in ["localid", "geoname"]:
                 edited_attributes[field_name] = line_edit.text()
             elif field_name in ["datebegin", "dateend"]:
                 edited_attributes[field_name] = line_edit.date()
