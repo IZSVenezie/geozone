@@ -6,7 +6,7 @@ from .GeoZONE_dialog import GeoZONEDialog
 from .GeoZONEEditDialog import GeoZONEEditDialog
 from os.path import expanduser
 import os
-import uuid
+import time
 import zipfile
 import subprocess
 from datetime import datetime
@@ -314,7 +314,9 @@ class GeoZONE:
         
     def generate_uuid4_string(self, string):
         # Generate MD5 hash of the input string
-        hash = hashlib.md5(string.encode()).hexdigest()
+
+        hash_string = string + str(int(time.time()))
+        hash = hashlib.md5(hash_string.encode()).hexdigest()
         
         # Construct the UUID4 string
         uuid4 = f"{hash[:8]}-" \
