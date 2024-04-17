@@ -215,7 +215,12 @@ class GeoZONE:
 
         geozone_layer.commitChanges()
 
+        for layer_id, layer in QgsProject.instance().mapLayers().items():
+            if layer.name() != "GeoZONE_Layer":
+                QgsProject.instance().removeMapLayer(layer)
+
         QgsMessageLog.logMessage("Selected geometries copied to GeoZONE_Layer", "GeoZONE", Qgis.Info)
+        QMessageBox.information(None, "Information", "Selected geometries copied to GeoZONE_Layer.")
 
 
 
