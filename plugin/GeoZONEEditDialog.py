@@ -160,7 +160,7 @@ class GeoZONEEditDialog(QDialog):
                 if line_edit.currentText() == "Proposed":
                     edited_attributes[field_name] = "PROPOSED"
                 elif line_edit.currentText() == "Officially recognized":
-                    edited_attributes[field_name] = "OFFICIALY_RECOGNIZED"
+                    edited_attributes[field_name] = "OFFICIALLY_RECOGNIZED"
                 elif line_edit.currentText() == "Self declaration":
                     edited_attributes[field_name] = "SELF_DECLARATION"
                 else:
