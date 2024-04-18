@@ -152,15 +152,15 @@ class GeoZONE:
 
             # Define the fields to add
             fields = QgsFields()
-            field_names = ["optype", "uuid", "countryf", "localid", "geoname", "accuracy",
-                        "zonetype", "subtype", "status", "disease", "datebegin", "dateend",
+            field_names = ["optype", "uuid", "localid", "geoname", "accuracy",
+                        "zonetype", "subtype", "status", "datebegin", "dateend", "disease", "countryf",
                         "s_avian", "s_bee", "s_bovine", "s_equine", "s_lago", "s_sh_go",
                         "s_swine", "s_other", "s_wild", "m_dest", "m_surv_w", "m_surv_o",
                         "m_trace", "m_stpout", "m_zoning", "m_movctrl", "m_quarant",
                         "m_vectctrl", "m_selkill", "m_screen", "m_vacc"]
 
             field_types = [QVariant.String] * 10 + [QVariant.Date, QVariant.Date] + [QVariant.Int] * 21
-            field_lengths = [10, 40, 10, 50, 250, 50, 50, 50, 11, 50, 10, 10]
+            field_lengths = [10, 36, 50, 250, 50, 100, 50, 50, 10, 10, 100, 150]
             i = 0
 
             for field_name, field_type in zip(field_names, field_types):
