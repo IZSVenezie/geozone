@@ -121,9 +121,9 @@ class GeoZONEEditDialog(QDialog):
         elif field.name() == "accuracy":
             return ["Inaccurate", "Accurate"]
         elif field.name() == "status":
-            return ["Proposed", "Officially recognized", "Self declaration", "NULL"]
+            return ["Proposed", "Officially recognized", "NULL"]
         elif field.name() == "subtype":
-            return ["Negligible risk", "Controlled risk", "NULL"]
+            return ["Negligible risk", "Controlled risk", "Undetermined", "NULL"]
         elif field.name() == "zonetype":
             return ["Free zone", "Containment zone", "Infected zone", "Protection zone"]
         elif field.name() == "countryf":
@@ -162,8 +162,6 @@ class GeoZONEEditDialog(QDialog):
                     edited_attributes[field_name] = "PROPOSED"
                 elif line_edit.currentText() == "Officially recognized":
                     edited_attributes[field_name] = "OFFICIALLY_RECOGNIZED"
-                elif line_edit.currentText() == "Self declaration":
-                    edited_attributes[field_name] = "SELF_DECLARATION"
                 else:
                     edited_attributes[field_name] = None
             elif field_name == "subtype":
@@ -171,6 +169,8 @@ class GeoZONEEditDialog(QDialog):
                     edited_attributes[field_name] = "NEGLIGIBLE_RISK"
                 elif line_edit.currentText() == "Controlled risk":
                     edited_attributes[field_name] = "CONTROLLED_RISK"
+                elif line_edit.currentText() == "Undetermined":
+                    edited_attributes[field_name] = "UNDETERMINED_RISK"
                 else:
                     edited_attributes[field_name] = None
             elif field_name == "zonetype":
