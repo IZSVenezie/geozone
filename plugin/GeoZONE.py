@@ -276,15 +276,32 @@ class GeoZONE:
 
     #################################### EDIT DIALOG ###############################
             
+    #def edit_attributes_dialog(self, layer, selected_features):
+    #    for feature in selected_features:
+    #        dialog = GeoZONEEditDialog(layer, feature)
+      #      result = dialog.exec_()
+
+     #       if result == QDialog.Accepted:
+      #          edited_attributes = dialog.get_edited_attributes()
+       #         QgsMessageLog.logMessage(f"Attributes edited: {edited_attributes}", "GeoZONE", Qgis.Info)
+       #         self.update_feature_attributes(feature, edited_attributes, layer)
+
     def edit_attributes_dialog(self, layer, selected_features):
         for feature in selected_features:
-            dialog = GeoZONEEditDialog(layer, feature)
+            # Get the existing attribute values of the feature
+            existing_attributes = feature.attributes()
+            # Convert the existing attribute values to a dictionary using field names as keys
+            existing_attributes_dict = {field.name(): value for field, value in zip(layer.fields(), existing_attributes)}
+            
+            # Pass the existing attribute values to the edit dialog
+            dialog = GeoZONEEditDialog(layer, feature, existing_attributes_dict)
             result = dialog.exec_()
 
             if result == QDialog.Accepted:
                 edited_attributes = dialog.get_edited_attributes()
                 QgsMessageLog.logMessage(f"Attributes edited: {edited_attributes}", "GeoZONE", Qgis.Info)
                 self.update_feature_attributes(feature, edited_attributes, layer)
+
 
     def update_feature_attributes(self, feature, edited_attributes, layer):
         # Start editing the layer

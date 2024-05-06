@@ -1,12 +1,14 @@
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QGroupBox, QFormLayout, QDialogButtonBox, QComboBox, QDateEdit
+from PyQt5.QtCore import Qt
 from qgis.core import QgsVectorLayer
 from qgis.PyQt.QtCore import QDate
 
 class GeoZONEEditDialog(QDialog):
-    def __init__(self, layer, feature, parent=None):
+    def __init__(self, layer, feature, existing_attributes_dict, parent=None):
         super(GeoZONEEditDialog, self).__init__(parent)
         self.layer = layer
         self.feature = feature
+        self.existing_attributes_dict = existing_attributes_dict
         self.init_ui()
 
     def init_ui(self):
@@ -76,6 +78,10 @@ class GeoZONEEditDialog(QDialog):
                 if field.name() in ["localid", "geoname"]:
                     line_edit = QLineEdit(str(self.feature[field.name()]))
                     line_edit.setMaxLength(50)
+                    if self.existing_attributes_dict[field.name()] != None:
+                        line_edit.setText(self.existing_attributes_dict[field.name()])
+                    else:
+                        line_edit.setText("")
                     group_layout = self._get_group_layout(field, general_layout, species_layout, measures_layout, group_counters)
                     group_layout.addRow(label, line_edit)
                     self.attribute_widgets[field.name()] = line_edit
@@ -83,7 +89,10 @@ class GeoZONEEditDialog(QDialog):
                 elif field.name() in ["datebegin", "dateend"]:
                     date_edit = QDateEdit()
                     date_edit.setCalendarPopup(True)
-                    date_edit.setDate(QDate.currentDate())
+                    if self.existing_attributes_dict[field.name()] != None:
+                        date_edit.setDate(self.existing_attributes_dict[field.name()])
+                    else:
+                        date_edit.setDate(QDate.currentDate())
                     group_layout = self._get_group_layout(field, general_layout, species_layout, measures_layout, group_counters)
                     group_layout.addRow(label, date_edit)
                     self.attribute_widgets[field.name()] = date_edit
@@ -92,6 +101,33 @@ class GeoZONEEditDialog(QDialog):
                     options = self._get_combo_box_options(field)
                     combo_box = QComboBox()
                     combo_box.addItems(options)
+                    if self.existing_attributes_dict[field.name()] != None:
+                        if field.name() in ["s_avian", "s_bee", "s_bovine", "s_equine", "s_lago", "s_sh_go", "s_swine", "s_other", "s_wild", "m_dest", "m_surv_w", "m_surv_o", "m_trace", "m_stpout", "m_zoning", "m_movctrl", "m_quarant", "m_vectctrl", "m_selkill", "m_screen", "m_vacc"]:
+                            combo_box.setCurrentIndex(self.existing_attributes_dict[field.name()])
+                        elif field.name() == "disease":
+                            combo_box.setCurrentIndex(int(self.existing_attributes_dict[field.name()]) - 1)
+                        elif field.name() == "accuracy":
+                            accuracy = ["INACCURATE", "ACCURATE"]
+                            position = accuracy.index(self.existing_attributes_dict[field.name()])
+                            combo_box.setCurrentIndex(position)
+                        elif field.name() == "status":
+                            status = ["PROPOSED", "OFFICIALLY_RECOGNIZED", "NULL"]
+                            position = status.index(self.existing_attributes_dict[field.name()])
+                            combo_box.setCurrentIndex(position)
+                        elif field.name() == "subtype":
+                            subtype = ["NEGLIGIBLE_RISK", "CONTROLLED_RISK", "UNDETERMINED_RISK", "NULL"]
+                            position = subtype.index(self.existing_attributes_dict[field.name()])
+                            combo_box.setCurrentIndex(position)
+                        elif field.name() == "zonetype":
+                            zonetype = ["FREE", "CONTAINMENT", "INFECTED", "PROTECTION"]
+                            position = zonetype.index(self.existing_attributes_dict[field.name()])
+                            combo_box.setCurrentIndex(position)
+                        elif field.name() == "countryf":
+                            countryf = ["ABW", "AFG", "AGO", "AIA", "AND", "ARE", "ARG", "ARM", "ASM", "ATA", "ATF", "BRB", "ALB", "BFA", "BGD", "BGR", "BHR", "BHS", "BIH", "BRN", "BTN", "DMA", "IRL", "BLR", "BLZ", "BMU", "BOL", "BRA", "GBR", "ATG", "AUS", "AUT", "AZE", "BDI", "BEL", "BEN", "BVT", "BWA", "CAF", "CAN", "CCK", "ESP", "CEU", "CHE", "CHL", "CHN", "CIV", "CMR", "COD", "COG", "COK", "COL", "COM", "CPV", "CRI", "CUB", "CUW", "EST", "ETH", "FIN", "FJI", "FLK", "FRA", "FRO", "FSM", "GAB", "IND", "DJI", "CXR", "CYM", "CYP", "CZE", "DEU", "DNK", "DOM", "DZA", "ECU", "EGY", "ERI", "GEO", "GHA", "GMB", "GNB", "GNQ", "GRC", "GRD", "GIB", "GIN", "GLP", "GRL", "GTM", "GUF", "GUM", "GUY", "HKG", "HMD", "HND", "HRV", "HTI", "HUN", "IDN", "IOT", "IRN", "IRQ", "ISR", "JPN", "KAZ", "KEN", "KGZ", "KHM", "KIR", "KNA", "KOR", "KWT", "LAO", "LBN", "LBR", "LBY", "MHL", "MKD", "MLI", "MLT", "MMR", "ISL", "ITA", "JAM", "JOR", "LCA", "MEX", "LIE", "LKA", "LSO", "LTU", "LUX", "LVA", "MDV", "MEL", "PAN", "MAC", "MAR", "MCO", "MDA", "MDG", "MNE", "MNG", "MNP", "MOZ", "MRT", "MTQ", "MUS", "MWI", "MYS", "MYT", "NAM", "NCL", "PER", "PHL", "PLW", "PNG", "POL", "MSR", "NER", "NZL", "OMN", "PAK", "NFK", "NGA", "NIC", "NPL", "NRU", "PRI", "NIU", "NLD", "NOR", "PRK", "PRT", "PRY", "PSE", "PYF", "QAT", "REU", "ROU", "RUS", "RWA", "SAU", "SDN", "SEN", "SGP", "SGS", "SHN", "SLB", "SLE", "SLV", "SMR", "SOM", "PCN", "SPM", "SVK", "SVN", "SWE", "SWZ", "SYC", "SYR", "THA", "TJK", "TKL", "TKM", "TLS", "VGB", "SRB", "SSD", "STP", "SUR", "TCA", "TCD", "TGO", "UMI", "TON", "TTO", "TUN", "TUR", "TUV", "TWN", "TZA", "UGA", "UKR", "URY", "USA", "UZB", "VAT", "VCT", "VEN", "VIR", "VNM", "VUT", "WLF", "WSM", "YEM", "ZAF", "ZMB", "ZWE"]
+                            position = countryf.index(self.existing_attributes_dict[field.name()])
+                            combo_box.setCurrentIndex(position)
+                    else:
+                        combo_box.setCurrentIndex(0)
                     group_layout = self._get_group_layout(field, general_layout, species_layout, measures_layout, group_counters)
                     group_layout.addRow(label, combo_box)
                     self.attribute_widgets[field.name()] = combo_box
