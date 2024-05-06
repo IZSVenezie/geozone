@@ -9,6 +9,7 @@ import os
 import time
 import zipfile
 import subprocess
+import platform
 from datetime import datetime
 import hashlib
 
@@ -268,8 +269,21 @@ class GeoZONE:
             layer.changeAttributeValue(feature.id(), layer.fields().indexFromName("optype"), "noaction")
         layer.commitChanges()
         
+        # Get the current operating system
+        current_os = platform.system()
+
+        # Define the command to open the folder based on the operating system
+        if current_os == 'Windows':
+            command = ['explorer', target_folder]
+        elif current_os == 'Linux':
+            command = ['xdg-open', target_folder]
+        else:
+            print(f'Unsupported operating system: {current_os}')
+            exit()
+
+        # Execute the command
         try:
-            subprocess.run(['explorer', target_folder], check=True)
+            subprocess.run(command, check=True)
         except subprocess.CalledProcessError:
             print(f'Failed to open the folder. Please navigate to {target_folder} manually.')
 
