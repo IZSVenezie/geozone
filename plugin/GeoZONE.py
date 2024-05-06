@@ -159,7 +159,7 @@ class GeoZONE:
                         "m_trace", "m_stpout", "m_zoning", "m_movctrl", "m_quarant",
                         "m_vectctrl", "m_selkill", "m_screen", "m_vacc"]
 
-            field_types = [QVariant.String] * 10 + [QVariant.Date, QVariant.Date] + [QVariant.Int] * 21
+            field_types = [QVariant.String] * 8 + [QVariant.Date, QVariant.Date] + [QVariant.String, QVariant.String] + [QVariant.Int] * 21
             field_lengths = [10, 36, 50, 250, 50, 100, 50, 50, 10, 10, 100, 150]
             i = 0
 
