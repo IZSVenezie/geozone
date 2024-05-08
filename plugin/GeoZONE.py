@@ -247,45 +247,46 @@ class GeoZONE:
         result = plugin_dialog.exec_()
 
         if result == QDialog.Accepted:
-            pass
+            files_to_zip = [home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".shp", home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".shx", home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".cpg", home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".dbf", home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".prj", home + "/GeoZONE/metadata.json"]
+            zip_filename = home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".zip"
 
-        files_to_zip = [home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".shp", home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".shx", home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".cpg", home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".dbf", home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".prj", home + "/GeoZONE/metadata.json"]
-        zip_filename = home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".zip"
+            with zipfile.ZipFile(zip_filename, 'w') as zip_file:
+                for file_to_zip in files_to_zip:
+                    if os.path.exists(file_to_zip):
+                        zip_file.write(file_to_zip, os.path.basename(file_to_zip))
+                        QgsMessageLog.logMessage(f'{file_to_zip} added to {zip_filename}')
+                        os.remove(file_to_zip)
+                    else:
+                        QgsMessageLog.logMessage(f'Warning: {file_to_zip} not found, skipping.')
+            
+            target_folder = os.path.dirname(os.path.abspath(zip_filename))
 
-        with zipfile.ZipFile(zip_filename, 'w') as zip_file:
-            for file_to_zip in files_to_zip:
-                if os.path.exists(file_to_zip):
-                    zip_file.write(file_to_zip, os.path.basename(file_to_zip))
-                    QgsMessageLog.logMessage(f'{file_to_zip} added to {zip_filename}')
-                    os.remove(file_to_zip)
-                else:
-                    QgsMessageLog.logMessage(f'Warning: {file_to_zip} not found, skipping.')
+            # Update optype field of each feature to "noaction"
+            layer.startEditing()
+            for feature in layer.selectedFeatures():
+                layer.changeAttributeValue(feature.id(), layer.fields().indexFromName("optype"), "noaction")
+            layer.commitChanges()
+            
+            # Get the current operating system
+            current_os = platform.system()
+
+            # Define the command to open the folder based on the operating system
+            if current_os == 'Windows':
+                command = ['explorer', target_folder]
+            elif current_os == 'Linux':
+                command = ['xdg-open', target_folder]
+            else:
+                print(f'Unsupported operating system: {current_os}')
+                exit()
+
+            # Execute the command
+            try:
+                subprocess.run(command, check=True)
+            except subprocess.CalledProcessError:
+                print(f'Failed to open the folder. Please navigate to {target_folder} manually.')
         
-        target_folder = os.path.dirname(os.path.abspath(zip_filename))
-
-        # Update optype field of each feature to "noaction"
-        layer.startEditing()
-        for feature in layer.selectedFeatures():
-            layer.changeAttributeValue(feature.id(), layer.fields().indexFromName("optype"), "noaction")
-        layer.commitChanges()
-        
-        # Get the current operating system
-        current_os = platform.system()
-
-        # Define the command to open the folder based on the operating system
-        if current_os == 'Windows':
-            command = ['explorer', target_folder]
-        elif current_os == 'Linux':
-            command = ['xdg-open', target_folder]
         else:
-            print(f'Unsupported operating system: {current_os}')
-            exit()
-
-        # Execute the command
-        try:
-            subprocess.run(command, check=True)
-        except subprocess.CalledProcessError:
-            print(f'Failed to open the folder. Please navigate to {target_folder} manually.')
+            QMessageBox.information(None, "Information", "Metadata information box not filled. Exporting process has been blocked.")
 
 
     #################################### EDIT DIALOG ###############################
