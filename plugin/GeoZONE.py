@@ -246,22 +246,23 @@ class GeoZONE:
         if not all_fields_valid:
             QMessageBox.warning(None, "Missing Data", "Not all mandatory fields are set for some of the selected geometries.")
             return
-
-        # Proceed if all fields are valid
-        current_timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        home = expanduser("~")
-        directory_path = os.path.join(home, 'GeoZONE')
-        if not os.path.exists(directory_path):
-            os.makedirs(directory_path)
-        save_path = os.path.join(directory_path, f"GeoZONE{current_timestamp}.shp")
-
-        QgsVectorFileWriter.writeAsVectorFormat(layer, save_path, "utf-8", layer.crs(), "ESRI Shapefile", onlySelected=True)
-        QgsMessageLog.logMessage(f"Layer saved successfully to {save_path}", "GeoZONE", Qgis.Info)
-
+        
         # Proceed with additional processing if layer saved successfully
         plugin_dialog = GeoZONEDialog()
         result = plugin_dialog.exec_()
         if result == QDialog.Accepted:
+
+            # Proceed if all fields are valid
+            current_timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            home = expanduser("~")
+            directory_path = os.path.join(home, 'GeoZONE')
+            if not os.path.exists(directory_path):
+                os.makedirs(directory_path)
+            save_path = os.path.join(directory_path, f"GeoZONE{current_timestamp}.shp")
+
+            QgsVectorFileWriter.writeAsVectorFormat(layer, save_path, "utf-8", layer.crs(), "ESRI Shapefile", onlySelected=True)
+            QgsMessageLog.logMessage(f"Layer saved successfully to {save_path}", "GeoZONE", Qgis.Info)
+
             # Assume metadata is saved to a JSON file as part of GeoZONEDialog processing
             metadata_file = os.path.join(directory_path, "metadata.json")
             files_to_zip = [save_path, f"{save_path[:-4]}.shx", f"{save_path[:-4]}.dbf", f"{save_path[:-4]}.prj", f"{save_path[:-4]}.cpg", metadata_file]
