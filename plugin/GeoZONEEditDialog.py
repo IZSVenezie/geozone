@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QGroupBox, QFormLayout, QDialogButtonBox, QComboBox, QDateEdit
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QGroupBox, QFormLayout, QDialogButtonBox, QComboBox, QDateEdit, QCheckBox
 from PyQt5.QtCore import Qt
 from qgis.core import QgsVectorLayer
 from qgis.PyQt.QtCore import QDate
@@ -10,6 +10,7 @@ class GeoZONEEditDialog(QDialog):
         self.feature = feature
         self.existing_attributes_dict = existing_attributes_dict
         self.init_ui()
+        self.validate_fields()  # Initial validation check
 
     def init_ui(self):
         layout = QVBoxLayout(self)
@@ -37,15 +38,15 @@ class GeoZONEEditDialog(QDialog):
         group_counters = {'general': 0, 'species': 0, 'measures': 0}
 
         label_dict = {
-            "countryf": "Country from",
-            "localid": "Local ID",
+            "countryf": "Country from *",
+            "localid": "Local ID *",
             "geoname": "Geographical name",
             "accuracy": "Accuracy",
-            "zonetype": "Zone type",
+            "zonetype": "Zone type *",
             "subtype": "Zone subtype",
             "status": "Zone status",
-            "disease": "Disease",
-            "datebegin": "From",
+            "disease": "Disease *",
+            "datebegin": "From *",
             "dateend": "To",
             "s_avian": "Avian species",
             "s_bee": "Bees",
@@ -89,10 +90,32 @@ class GeoZONEEditDialog(QDialog):
                 elif field.name() in ["datebegin", "dateend"]:
                     date_edit = QDateEdit()
                     date_edit.setCalendarPopup(True)
-                    if self.existing_attributes_dict[field.name()] != None:
-                        date_edit.setDate(self.existing_attributes_dict[field.name()])
-                    else:
-                        date_edit.setDate(QDate.currentDate())
+
+                    if field.name() == "dateend":
+                        # Checkbox to enable/disable the "To" date
+                        self.date_checkbox = QCheckBox("Specify End Date")
+                        self.date_checkbox.setChecked(False)  # Default as not specified
+                        date_edit.setEnabled(False)  # Disable by default
+                        self.date_checkbox.toggled.connect(lambda checked, de=date_edit: de.setEnabled(checked))
+                        group_layout = self._get_group_layout(field, general_layout, species_layout, measures_layout, group_counters)
+                        group_layout.addRow(self.date_checkbox)
+                        date_edit.setDate(QDate().currentDate())  
+
+                    else:  # Handle "datebegin" field which must have a date
+                        date_value = self.existing_attributes_dict.get(field.name())
+                        # Attempt to convert directly if it's already a string, or use a default value
+                        if isinstance(date_value, str):
+                            converted_date = QDate.fromString(date_value, 'yyyy-MM-dd')
+                            if converted_date.isValid():
+                                date_edit.setDate(converted_date)
+                            else:
+                                date_edit.setDate(QDate.currentDate())
+                        elif date_value is not None:
+                            # Fall back to current date if conversion is not possible
+                            date_edit.setDate(QDate.currentDate())
+                        else:
+                            date_edit.setDate(QDate.currentDate())
+
                     group_layout = self._get_group_layout(field, general_layout, species_layout, measures_layout, group_counters)
                     group_layout.addRow(label, date_edit)
                     self.attribute_widgets[field.name()] = date_edit
@@ -133,10 +156,38 @@ class GeoZONEEditDialog(QDialog):
                     self.attribute_widgets[field.name()] = combo_box
 
         # Add button box
-        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        button_box.accepted.connect(self.accept)
-        button_box.rejected.connect(self.reject)
-        layout.addWidget(button_box)
+        self.button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        self.ok_button = self.button_box.button(QDialogButtonBox.Ok)
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
+        layout.addWidget(self.button_box)
+
+        # Set up validation connections
+        for name, widget in self.attribute_widgets.items():
+            if isinstance(widget, QLineEdit):
+                widget.textChanged.connect(self.validate_fields)
+            elif isinstance(widget, QComboBox):
+                widget.currentIndexChanged.connect(self.validate_fields)
+
+
+
+    def validate_fields(self):
+        required_fields = ['localid', 'zonetype', 'datebegin', 'disease', 'countryf']
+        all_filled = True
+        for field in required_fields:
+            widget = self.attribute_widgets.get(field)
+            if isinstance(widget, QLineEdit):
+                if not widget.text().strip():
+                    all_filled = False
+            elif isinstance(widget, QComboBox):
+                if widget.currentIndex() == -1 or widget.currentText() == "":
+                    all_filled = False
+            elif isinstance(widget, QDateEdit):
+                # Assume date is always filled, customize as needed
+                pass
+        self.ok_button.setEnabled(all_filled)
+
+
 
     def _get_group_layout(self, field, general_layout, species_layout, measures_layout, group_counters):
         if group_counters['general'] < 10:
@@ -148,6 +199,8 @@ class GeoZONEEditDialog(QDialog):
         else:
             group_counters['measures'] += 1
             return measures_layout
+        
+
 
     def _get_combo_box_options(self, field):
         if field.name() in ["s_avian", "s_bee", "s_bovine", "s_equine", "s_lago", "s_sh_go", "s_swine", "s_other", "s_wild", "m_dest", "m_surv_w", "m_surv_o", "m_trace", "m_stpout", "m_zoning", "m_movctrl", "m_quarant", "m_vectctrl", "m_selkill", "m_screen", "m_vacc"]:
@@ -166,6 +219,8 @@ class GeoZONEEditDialog(QDialog):
             return ["Aruba", "Afghanistan", "Angola", "Anguilla", "Andorra", "United Arab Emirates", "Argentina", "Armenia", "American Samoa", "Antarctica", "French Southern Territories", "Barbados", "Albania", "Burkina Faso", "Bangladesh", "Bulgaria", "Bahrain", "Bahamas", "Bosnia and Herzegovina", "Brunei", "Bhutan", "Dominica", "Ireland", "Belarus", "Belize", "Bermuda", "Bolivia", "Brazil", "United Kingdom", "Antigua and Barbuda", "Australia", "Austria", "Azerbaijan", "Burundi", "Belgium", "Benin", "Bouvet Island", "Botswana", "Central African (Rep.)", "Canada", "Cocos (Keeling) Islands", "Spain", "Ceuta", "Switzerland", "Chile", "China (People's Rep. of)", "Cote D'Ivoire", "Cameroon", "Congo (Dem. Rep. of the)", "Congo (Rep. of the)", "Cook Islands", "Colombia", "Comoros", "Cabo verde", "Costa Rica", "Cuba", "CuraÃ§ao", "Estonia", "Ethiopia", "Finland", "Fiji", "Falkland Islands", "France", "Faeroe Islands", "Micronesia (Federated States of)", "Gabon", "India", "Djibouti", "Christmas Island", "Cayman Islands", "Cyprus", "Czech Republic", "Germany", "Denmark", "Dominican (Rep.)", "Algeria", "Ecuador", "Egypt", "Eritrea", "Georgia", "Ghana", "Gambia", "Guinea-Bissau", "Equatorial Guinea", "Greece", "Grenada", "Gibraltar", "Guinea", "Guadaloupe", "Greenland", "Guatemala", "French Guiana", "Guam", "Guyana", "Hong Kong", "Heard and McDonald Islands", "Honduras", "Croatia", "Haiti", "Hungary", "Indonesia", "British Indian Ocean Territory", "Iran", "Iraq", "Israel", "Japan", "Kazakhstan", "Kenya", "Kyrgyzstan", "Cambodia", "Kiribati", "St. Kitts and Nevis", "Korea (Rep. of)", "Kuwait", "Laos", "Lebanon", "Liberia", "Libya", "Marshall Islands", "Former Yug. Rep. of Macedonia", "Mali", "Malta", "Myanmar", "Iceland", "Italy", "Jamaica", "Jordan", "St. Lucia", "Mexico", "Liechtenstein", "Sri Lanka", "Lesotho", "Lithuania", "Luxembourg", "Latvia", "Maldives", "Melilla", "Panama", "Macao", "Morocco", "Monaco", "Moldova", "Madagascar", "Montenegro", "Mongolia", "Northern Mariana Islands", "Mozambique", "Mauritania", "Martinique", "Mauritius", "Malawi", "Malaysia", "Mayotte", "Namibia", "New Caledonia", "Peru", "Philippines", "Palau", "Papua New Guinea", "Poland", "Montserrat", "Niger", "New Zealand", "Oman", "Pakistan", "Norfolk Island", "Nigeria", "Nicaragua", "Nepal", "Nauru", "Puerto Rico", "Niue", "Netherlands", "Norway", "Korea (Dem People's Rep. of)", "Portugal", "Paraguay", "Palestine", "French Polynesia", "Qatar", "Reunion", "Romania", "Russia", "Rwanda", "Saudi Arabia", "Sudan", "Senegal", "Singapore", "South Georgia and the South Sandwich Islands", "St. Helena", "Solomon Islands", "Sierra Leone", "El Salvador", "San Marino", "Somalia", "Pitcairn Island", "St. Pierre and Miquelon", "Slovakia", "Slovenia", "Sweden", "Swaziland", "Seychelles", "Syria", "Thailand", "Tajikistan", "Tokelau", "Turkmenistan", "Timor-Leste", "British Virgin Islands", "Serbia", "South Sudan (Rep. of)", "Sao Tome and Principe", "Suriname", "Turks and Caicos Islands", "Chad", "Togo", "United States Minor Outlying Islands", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Tuvalu", "Chinese Taipei", "Tanzania", "Uganda", "Ukraine", "Uruguay", "United States of America", "Uzbekistan", "Vatican City", "St. Vincent and the Grenadines", "Venezuela", "US Virgin Islands", "Vietnam", "Vanuatu", "Wallis and Futuna Islands", "Samoa", "Yemen", "South Africa", "Zambia", "Zimbabwe"]
         else:
             return ["opt1", "opt2"]
+        
+
 
     def get_edited_attributes(self):
         edited_attributes = {}
@@ -175,7 +230,17 @@ class GeoZONEEditDialog(QDialog):
             if field_name in ["localid", "geoname"]:
                 edited_attributes[field_name] = line_edit.text()
             elif field_name in ["datebegin", "dateend"]:
-                edited_attributes[field_name] = line_edit.date()
+                if field_name == "dateend" and not self.date_checkbox.isChecked():
+                    # Set the attribute to None or another placeholder for a null value
+                    edited_attributes[field_name] = None
+                else:
+                    # Retrieve the date from the QDateEdit widget
+                    qdate = line_edit.date()
+                    # Convert QDate to a string or another format if necessary
+                    if qdate.isValid():
+                        edited_attributes[field_name] = qdate.toString("yyyy-MM-dd")
+                    else:
+                        edited_attributes[field_name] = None
             elif field_name in ["s_avian", "s_bee", "s_bovine", "s_equine", "s_lago", "s_sh_go", "s_swine", "s_other", "s_wild", "m_dest", "m_surv_w", "m_surv_o", "m_trace", "m_stpout", "m_zoning", "m_movctrl", "m_quarant", "m_vectctrl", "m_selkill", "m_screen", "m_vacc"]:
                 bit_val = 0
                 if line_edit.currentText() == 'YES':

@@ -1,7 +1,7 @@
 from qgis.PyQt.QtGui import QIcon
-from PyQt5.QtCore import QVariant, QSettings
+from PyQt5.QtCore import QVariant
 from qgis.PyQt.QtWidgets import QAction, QMenu, QMessageBox, QDialog, QVBoxLayout, QLabel, QPushButton
-from qgis.core import QgsVectorLayer, QgsRasterLayer, QgsProject, QgsField, QgsFields, QgsVectorFileWriter, QgsMessageLog, Qgis, QgsFeature, QgsMapLayerStyle
+from qgis.core import QgsVectorLayer, QgsRasterLayer, QgsProject, QgsField, QgsFields, QgsVectorFileWriter, QgsMessageLog, Qgis, QgsFeature
 from .GeoZONE_dialog import GeoZONEDialog
 from .GeoZONEEditDialog import GeoZONEEditDialog
 from os.path import expanduser
