@@ -5,7 +5,7 @@ from os.path import expanduser
 import os
 from qgis.PyQt.QtCore import QDate
 
-class GeoZONEDialog(QDialog):
+class GeoZoneDialog(QDialog):
     def __init__(self):
         super().__init__()
 
@@ -73,16 +73,14 @@ class GeoZONEDialog(QDialog):
         # Store data in a JSON file
         home = expanduser("~")
         home = home.replace('\\', '/')
-        if not os.path.exists(home + '/GeoZONE'):
-            os.makedirs(home + '/GeoZONE')
+        if not os.path.exists(home + '/GeoZone'):
+            os.makedirs(home + '/GeoZone')
 
         
-        file_path = home + "/GeoZONE/metadata.json"
+        file_path = home + "/GeoZone/metadata.json"
         with open(file_path, "w") as json_file:
             json.dump(data, json_file, indent=2)
 
-        # Display a confirmation message
-        QgsMessageLog.logMessage("Metadata stored successfully in {}".format(file_path), "GeoZONE", Qgis.Info)
 
         # Display a confirmation message using QMessageBox
         QMessageBox.information(self, "Confirmation", "Metadata stored successfully in {}".format(file_path))

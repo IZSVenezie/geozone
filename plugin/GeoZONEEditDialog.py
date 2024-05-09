@@ -3,9 +3,9 @@ from PyQt5.QtCore import Qt
 from qgis.core import QgsVectorLayer
 from qgis.PyQt.QtCore import QDate
 
-class GeoZONEEditDialog(QDialog):
+class GeoZoneEditDialog(QDialog):
     def __init__(self, layer, feature, existing_attributes_dict, parent=None):
-        super(GeoZONEEditDialog, self).__init__(parent)
+        super(GeoZoneEditDialog, self).__init__(parent)
         self.layer = layer
         self.feature = feature
         self.existing_attributes_dict = existing_attributes_dict

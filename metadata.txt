@@ -3,7 +3,7 @@ name=GeoZone
 email=gis@izsvenezie.it
 author=Mirco Cazzaro
 qgisMinimumVersion=3.22
-description=QGIS Plugin for adding and modifying zone data in compliance with the GeoZONE schema, facilitating sharing with partners or uploading to a central web repository.
+description=QGIS Plugin for adding and modifying zone data in compliance with the GeoZone schema, facilitating sharing with partners or uploading to a central web repository.
 about=This project is designed to support initiatives conforming to the Terrestrial Code Chapter on Zoning and Compartmentalisation.
 version=0.1
 

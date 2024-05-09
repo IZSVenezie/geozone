@@ -2,8 +2,8 @@ from qgis.PyQt.QtGui import QIcon
 from PyQt5.QtCore import QVariant
 from qgis.PyQt.QtWidgets import QAction, QMenu, QMessageBox, QDialog, QVBoxLayout, QLabel, QPushButton
 from qgis.core import QgsVectorLayer, QgsRasterLayer, QgsProject, QgsField, QgsFields, QgsVectorFileWriter, QgsMessageLog, Qgis, QgsFeature
-from .GeoZONE_dialog import GeoZONEDialog
-from .GeoZONEEditDialog import GeoZONEEditDialog
+from .GeoZone_dialog import GeoZoneDialog
+from .GeoZoneEditDialog import GeoZoneEditDialog
 from os.path import expanduser
 import os
 import time
@@ -16,7 +16,7 @@ import hashlib
 class CustomDialog(QDialog):
     def __init__(self, parent=None):
         super(CustomDialog, self).__init__(parent)
-        self.setWindowTitle("GeoZONE")
+        self.setWindowTitle("GeoZone")
         layout = QVBoxLayout(self)
         layout.addWidget(QLabel("You have selected just one feature. Select the action you want to perform:"))
         edit_button = QPushButton("Edit Attributes", self)
@@ -35,20 +35,20 @@ class CustomDialog(QDialog):
         self.accept()
 
 
-class GeoZONE:
+class GeoZone:
     def __init__(self, iface):
         self.iface = iface
 
     def initGui(self):
         # Create a menu entry if it doesn't exist
-        self.menu = self.iface.mainWindow().findChild(QMenu, '&GeoZONE')
+        self.menu = self.iface.mainWindow().findChild(QMenu, '&GeoZone')
         if not self.menu:
-            self.menu = QMenu('&GeoZONE', self.iface.mainWindow().menuBar())
+            self.menu = QMenu('&GeoZone', self.iface.mainWindow().menuBar())
             self.iface.mainWindow().menuBar().addMenu(self.menu)
 
         icon_path = 'logo.png'
 
-        self.action = QAction(QIcon(icon_path), "GeoZONE", self.iface.mainWindow())
+        self.action = QAction(QIcon(icon_path), "GeoZone", self.iface.mainWindow())
         self.action.triggered.connect(self.run_plugin)
         self.menu.addAction(self.action)
 
@@ -60,14 +60,14 @@ class GeoZONE:
 
     def run_plugin(self):
         flag = 0
-        # Check if GeoZONE_Layer exists, if not, create it
-        existing_layers = QgsProject.instance().mapLayersByName("GeoZONE_Layer")
+        # Check if GeoZone_Layer exists, if not, create it
+        existing_layers = QgsProject.instance().mapLayersByName("GeoZone_Layer")
         if not existing_layers:
             flag = 2
             self.create_empty_layer()
 
-        # Get the GeoZONE_Layer
-        geozone_layer = QgsProject.instance().mapLayersByName("GeoZONE_Layer")[0]
+        # Get the GeoZone_Layer
+        geozone_layer = QgsProject.instance().mapLayersByName("GeoZone_Layer")[0]
 
         geozone_layer.startEditing()
         for feature in geozone_layer.getFeatures():
@@ -83,9 +83,9 @@ class GeoZONE:
             if isinstance(layer, QgsRasterLayer): 
                 pass
             else:
-                # Skip GeoZONE_Layer itself
+                # Skip GeoZone_Layer itself
                 if layer_id == geozone_layer.id():
-                    # Check if geometries from the GeoZONE_Layer are selected
+                    # Check if geometries from the GeoZone_Layer are selected
                     selected_features = geozone_layer.selectedFeatures()
                     if selected_features:
                         flag = 1
@@ -108,14 +108,14 @@ class GeoZONE:
 
                 if selected_features:
                     flag = 1
-                    # If geometries are selected, copy them to GeoZONE_Layer
+                    # If geometries are selected, copy them to GeoZone_Layer
                     self.copy_selected_geometries(geozone_layer, selected_features)
 
-        # If no geometry is selected, save the GeoZONE_Layer and prompt for metadata
+        # If no geometry is selected, save the GeoZone_Layer and prompt for metadata
         #if not geozone_layer.selectedFeatures():
         if flag == 0:
             QMessageBox.information(None, "Information", "No operation performed. Select the feature you want to edit or the features you want to export in order to continue.")
-            #old save_layer_with_metadata callpoint (was exporting all GeoZONE features)
+            #old save_layer_with_metadata callpoint (was exporting all GeoZone features)
             
 
     
@@ -123,34 +123,34 @@ class GeoZONE:
     ################################################ LOAD GEOZONE (load/create db shp) ###############################################
 
     def create_empty_layer(self):
-        # Default location for GeoZONE_Layer
+        # Default location for GeoZone_Layer
         layer = None
         home = expanduser("~")
         default_layer_path = os.path.join(home, 'geozone.shp')
 
-        existing_layers = QgsProject.instance().mapLayersByName("GeoZONE_Layer")
+        existing_layers = QgsProject.instance().mapLayersByName("GeoZone_Layer")
 
         if existing_layers:
-            # GeoZONE_Layer already exists, open it
+            # GeoZone_Layer already exists, open it
             layer = existing_layers[0]
         elif os.path.exists(default_layer_path):
-            # GeoZONE_Layer not loaded, but exists at default position, load it
-            layer = QgsVectorLayer(default_layer_path, "GeoZONE_Layer", "ogr")
+            # GeoZone_Layer not loaded, but exists at default position, load it
+            layer = QgsVectorLayer(default_layer_path, "GeoZone_Layer", "ogr")
             if not layer.isValid():
-                QMessageBox.critical(None, "Error", "Error loading the GeoZONE_Layer. Please check the file.")
-                QgsMessageLog.logMessage("Error loading the GeoZONE_Layer", "GeoZONE", Qgis.Critical)
+                QMessageBox.critical(None, "Error", "Error loading the GeoZone_Layer. Please check the file.")
+                QgsMessageLog.logMessage("Error loading the GeoZone_Layer", "GeoZone", Qgis.Critical)
                 return
         else:
-            # GeoZONE_Layer not loaded and not found at default position, create an empty layer
-            layer_name = "GeoZONE_Layer"
+            # GeoZone_Layer not loaded and not found at default position, create an empty layer
+            layer_name = "GeoZone_Layer"
             layer_type = "Polygon"
             crs = "EPSG:4326"
 
             # Create a new vector layer with specified fields
             layer = QgsVectorLayer(f"{layer_type}?crs={crs}&index=yes", layer_name, "memory")
             if not layer.isValid():
-                QMessageBox.critical(None, "Error", "Error creating the GeoZONE_Layer. Please check the parameters.")
-                QgsMessageLog.logMessage("Error creating the GeoZONE_Layer", "GeoZONE", Qgis.Critical)
+                QMessageBox.critical(None, "Error", "Error creating the GeoZone_Layer. Please check the parameters.")
+                QgsMessageLog.logMessage("Error creating the GeoZone_Layer", "GeoZone", Qgis.Critical)
                 return
 
             # Define the fields to add
@@ -187,23 +187,23 @@ class GeoZONE:
         QgsProject.instance().addMapLayer(layer)
 
         # Log and show a confirmation message
-        QgsMessageLog.logMessage("GeoZONE_Layer opened successfully.", "GeoZONE", Qgis.Info)
-        QMessageBox.information(None, "Information", "GeoZONE_Layer opened successfully.")
+        QgsMessageLog.logMessage("GeoZone_Layer opened successfully.", "GeoZone", Qgis.Info)
+        QMessageBox.information(None, "Information", "GeoZone_Layer opened successfully.")
 
 
 
     ################################################ IMPORT GEOMETRIES (from other layers) ###############################################
 
     def copy_selected_geometries(self, layer, selected_features):
-        # Check if GeoZONE_Layer exists, if not, create it
-        existing_layers = QgsProject.instance().mapLayersByName("GeoZONE_Layer")
+        # Check if GeoZone_Layer exists, if not, create it
+        existing_layers = QgsProject.instance().mapLayersByName("GeoZone_Layer")
         if not existing_layers:
             self.create_empty_layer()
 
-        # Get the GeoZONE_Layer
-        geozone_layer = QgsProject.instance().mapLayersByName("GeoZONE_Layer")[0]
+        # Get the GeoZone_Layer
+        geozone_layer = QgsProject.instance().mapLayersByName("GeoZone_Layer")[0]
 
-        # Add selected features to GeoZONE_Layer
+        # Add selected features to GeoZone_Layer
         geozone_layer.startEditing()
         geozone_layer_data = geozone_layer.dataProvider()
 
@@ -219,11 +219,11 @@ class GeoZONE:
         geozone_layer.commitChanges()
 
         for layer_id, layer in QgsProject.instance().mapLayers().items():
-            if layer.name() != "GeoZONE_Layer":
+            if layer.name() != "GeoZone_Layer":
                 QgsProject.instance().removeMapLayer(layer)
 
-        QgsMessageLog.logMessage("Selected geometries copied to GeoZONE_Layer", "GeoZONE", Qgis.Info)
-        QMessageBox.information(None, "Information", "Selected geometries copied to GeoZONE_Layer.")
+        QgsMessageLog.logMessage("Selected geometries copied to GeoZone_Layer", "GeoZone", Qgis.Info)
+        QMessageBox.information(None, "Information", "Selected geometries copied to GeoZone_Layer.")
 
 
 
@@ -248,34 +248,34 @@ class GeoZONE:
             return
         
         # Proceed with additional processing if layer saved successfully
-        plugin_dialog = GeoZONEDialog()
+        plugin_dialog = GeoZoneDialog()
         result = plugin_dialog.exec_()
         if result == QDialog.Accepted:
 
             # Proceed if all fields are valid
             current_timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             home = expanduser("~")
-            directory_path = os.path.join(home, 'GeoZONE')
+            directory_path = os.path.join(home, 'GeoZone')
             if not os.path.exists(directory_path):
                 os.makedirs(directory_path)
-            save_path = os.path.join(directory_path, f"GeoZONE{current_timestamp}.shp")
+            save_path = os.path.join(directory_path, f"GeoZone{current_timestamp}.shp")
 
             QgsVectorFileWriter.writeAsVectorFormat(layer, save_path, "utf-8", layer.crs(), "ESRI Shapefile", onlySelected=True)
-            QgsMessageLog.logMessage(f"Layer saved successfully to {save_path}", "GeoZONE", Qgis.Info)
+            QgsMessageLog.logMessage(f"Layer saved successfully to {save_path}", "GeoZone", Qgis.Info)
 
-            # Assume metadata is saved to a JSON file as part of GeoZONEDialog processing
+            # Assume metadata is saved to a JSON file as part of GeoZoneDialog processing
             metadata_file = os.path.join(directory_path, "metadata.json")
             files_to_zip = [save_path, f"{save_path[:-4]}.shx", f"{save_path[:-4]}.dbf", f"{save_path[:-4]}.prj", f"{save_path[:-4]}.cpg", metadata_file]
-            zip_filename = os.path.join(directory_path, f"GeoZONE{current_timestamp}.zip")
+            zip_filename = os.path.join(directory_path, f"GeoZone{current_timestamp}.zip")
 
             with zipfile.ZipFile(zip_filename, 'w') as zip_file:
                 for file_path in files_to_zip:
                     if os.path.exists(file_path):
                         zip_file.write(file_path, os.path.basename(file_path))
-                        QgsMessageLog.logMessage(f"{file_path} added to {zip_filename}", "GeoZONE")
+                        QgsMessageLog.logMessage(f"{file_path} added to {zip_filename}", "GeoZone")
                         os.remove(file_path)
                     else:
-                        QgsMessageLog.logMessage(f"Warning: {file_path} not found, skipping.", "GeoZONE")
+                        QgsMessageLog.logMessage(f"Warning: {file_path} not found, skipping.", "GeoZone")
 
             # Open the folder containing the zip file
             target_folder = os.path.dirname(os.path.abspath(zip_filename))
@@ -304,12 +304,12 @@ class GeoZONE:
             
     #def edit_attributes_dialog(self, layer, selected_features):
     #    for feature in selected_features:
-    #        dialog = GeoZONEEditDialog(layer, feature)
+    #        dialog = GeoZoneEditDialog(layer, feature)
       #      result = dialog.exec_()
 
      #       if result == QDialog.Accepted:
       #          edited_attributes = dialog.get_edited_attributes()
-       #         QgsMessageLog.logMessage(f"Attributes edited: {edited_attributes}", "GeoZONE", Qgis.Info)
+       #         QgsMessageLog.logMessage(f"Attributes edited: {edited_attributes}", "GeoZone", Qgis.Info)
        #         self.update_feature_attributes(feature, edited_attributes, layer)
 
     def edit_attributes_dialog(self, layer, selected_features):
@@ -320,12 +320,12 @@ class GeoZONE:
             existing_attributes_dict = {field.name(): value for field, value in zip(layer.fields(), existing_attributes)}
             
             # Pass the existing attribute values to the edit dialog
-            dialog = GeoZONEEditDialog(layer, feature, existing_attributes_dict)
+            dialog = GeoZoneEditDialog(layer, feature, existing_attributes_dict)
             result = dialog.exec_()
 
             if result == QDialog.Accepted:
                 edited_attributes = dialog.get_edited_attributes()
-                QgsMessageLog.logMessage(f"Attributes edited: {edited_attributes}", "GeoZONE", Qgis.Info)
+                QgsMessageLog.logMessage(f"Attributes edited: {edited_attributes}", "GeoZone", Qgis.Info)
                 self.update_feature_attributes(feature, edited_attributes, layer)
 
 

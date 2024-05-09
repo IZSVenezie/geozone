@@ -1,3 +1,3 @@
 def classFactory(iface):
-    from .plugin.GeoZONE import GeoZONE
-    return GeoZONE(iface)
+    from .plugin.GeoZone import GeoZone
+    return GeoZone(iface)
