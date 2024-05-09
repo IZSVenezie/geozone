@@ -73,7 +73,8 @@ class GeoZONE:
         for feature in geozone_layer.getFeatures():
             if not feature["optype"]:
                 feature["optype"] = "INSERT"
-                #
+                for field in ["s_avian", "s_bee", "s_bovine", "s_equine", "s_lago", "s_sh_go", "s_swine", "s_other", "s_wild", "m_dest", "m_surv_w", "m_surv_o", "m_trace", "m_stpout", "m_zoning", "m_movctrl", "m_quarant", "m_vectctrl", "m_selkill", "m_screen", "m_vacc"]:
+                    feature[field] = 0
                 geozone_layer.updateFeature(feature)
         geozone_layer.commitChanges()        
         
@@ -229,65 +230,73 @@ class GeoZONE:
     ################################################ SAVE LAYER (selected geometries) ###############################################
 
     def save_layer_with_metadata(self, layer, flag):
-        # Save the layer to the specified path
-        current_timestamp = datetime.now()
-        formatted_timestamp = current_timestamp.strftime('%Y%m%d_%H%M%S')
+        # Define mandatory fields
+        mandatory_fields = ['localid', 'zonetype', 'datebegin', 'disease']  # Adjust field names as necessary
+
+        # Check if all mandatory fields are correctly set
+        all_fields_valid = True
+        for feature in layer.selectedFeatures():
+            for field_name in mandatory_fields:
+                if not feature[field_name] or feature[field_name] in [None, "", "Invalid"]:  # Adjust invalid conditions as needed
+                    all_fields_valid = False
+                    break
+            if not all_fields_valid:
+                break
+
+        if not all_fields_valid:
+            QMessageBox.warning(None, "Missing Data", "Not all mandatory fields are set for some of the selected geometries.")
+            return
+
+        # Proceed if all fields are valid
+        current_timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         home = expanduser("~")
-        if not os.path.exists(home + '/GeoZONE'):
-            os.makedirs(home + '/GeoZONE')
-        save_path = home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".shp"
+        directory_path = os.path.join(home, 'GeoZONE')
+        if not os.path.exists(directory_path):
+            os.makedirs(directory_path)
+        save_path = os.path.join(directory_path, f"GeoZONE{current_timestamp}.shp")
 
-        QgsVectorFileWriter.writeAsVectorFormat(layer, save_path, "utf-8", layer.crs(), "ESRI Shapefile", onlySelected = True)
+        QgsVectorFileWriter.writeAsVectorFormat(layer, save_path, "utf-8", layer.crs(), "ESRI Shapefile", onlySelected=True)
+        QgsMessageLog.logMessage(f"Layer saved successfully to {save_path}", "GeoZONE", Qgis.Info)
 
-        # Display a confirmation message
-        QgsMessageLog.logMessage("Layer saved successfully to {}".format(save_path), "GeoZONE", Qgis.Info)
-
-        
-        # Prompt for metadata and save to JSON
+        # Proceed with additional processing if layer saved successfully
         plugin_dialog = GeoZONEDialog()
         result = plugin_dialog.exec_()
-
         if result == QDialog.Accepted:
-            files_to_zip = [home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".shp", home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".shx", home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".cpg", home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".dbf", home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".prj", home + "/GeoZONE/metadata.json"]
-            zip_filename = home + "/GeoZONE/GeoZONE" + formatted_timestamp + ".zip"
+            # Assume metadata is saved to a JSON file as part of GeoZONEDialog processing
+            metadata_file = os.path.join(directory_path, "metadata.json")
+            files_to_zip = [save_path, f"{save_path[:-4]}.shx", f"{save_path[:-4]}.dbf", f"{save_path[:-4]}.prj", f"{save_path[:-4]}.cpg", metadata_file]
+            zip_filename = os.path.join(directory_path, f"GeoZONE{current_timestamp}.zip")
 
             with zipfile.ZipFile(zip_filename, 'w') as zip_file:
-                for file_to_zip in files_to_zip:
-                    if os.path.exists(file_to_zip):
-                        zip_file.write(file_to_zip, os.path.basename(file_to_zip))
-                        QgsMessageLog.logMessage(f'{file_to_zip} added to {zip_filename}')
-                        os.remove(file_to_zip)
+                for file_path in files_to_zip:
+                    if os.path.exists(file_path):
+                        zip_file.write(file_path, os.path.basename(file_path))
+                        QgsMessageLog.logMessage(f"{file_path} added to {zip_filename}", "GeoZONE")
+                        os.remove(file_path)
                     else:
-                        QgsMessageLog.logMessage(f'Warning: {file_to_zip} not found, skipping.')
-            
+                        QgsMessageLog.logMessage(f"Warning: {file_path} not found, skipping.", "GeoZONE")
+
+            # Open the folder containing the zip file
             target_folder = os.path.dirname(os.path.abspath(zip_filename))
+            self.open_folder_command(target_folder)
+        else:
+            QMessageBox.warning(None, "Information", "Metadata information box not filled. Exporting process has been blocked.")
 
-            # Update optype field of each feature to "noaction"
-            layer.startEditing()
-            for feature in layer.selectedFeatures():
-                layer.changeAttributeValue(feature.id(), layer.fields().indexFromName("optype"), "noaction")
-            layer.commitChanges()
-            
-            # Get the current operating system
-            current_os = platform.system()
-
-            # Define the command to open the folder based on the operating system
-            if current_os == 'Windows':
-                command = ['explorer', target_folder]
-            elif current_os == 'Linux':
-                command = ['xdg-open', target_folder]
-            else:
-                print(f'Unsupported operating system: {current_os}')
-                exit()
-
-            # Execute the command
+    def open_folder_command(self, target_folder):
+        current_os = platform.system()
+        command_map = {
+            'Windows': ['explorer', target_folder],
+            'Linux': ['xdg-open', target_folder],
+            'Darwin': ['open', target_folder]  # macOS
+        }
+        command = command_map.get(current_os)
+        if command:
             try:
                 subprocess.run(command, check=True)
             except subprocess.CalledProcessError:
-                print(f'Failed to open the folder. Please navigate to {target_folder} manually.')
-        
+                pass
         else:
-            QMessageBox.information(None, "Information", "Metadata information box not filled. Exporting process has been blocked.")
+            QMessageBox.warning(None, "Unsupported OS", f"Unsupported operating system: {current_os}")
 
 
     #################################### EDIT DIALOG ###############################
