@@ -190,7 +190,7 @@ class GeoZONEEditDialog(QDialog):
 
 
     def _get_group_layout(self, field, general_layout, species_layout, measures_layout, group_counters):
-        if group_counters['general'] < 10:
+        if group_counters['general'] < 11:
             group_counters['general'] += 1
             return general_layout
         elif group_counters['species'] < 9:
