@@ -72,7 +72,8 @@ class GeoZONE:
         geozone_layer.startEditing()
         for feature in geozone_layer.getFeatures():
             if not feature["optype"]:
-                feature["optype"] = "insert"
+                feature["optype"] = "INSERT"
+                #
                 geozone_layer.updateFeature(feature)
         geozone_layer.commitChanges()        
         
@@ -209,7 +210,7 @@ class GeoZONE:
             new_feature = QgsFeature(layer.fields())
             new_feature.setGeometry(feature.geometry())
             #new_feature.setAttributes(feature.attributes())
-            new_feature["optype"] = "insert"
+            new_feature["optype"] = "INSERT"
             new_feature["uuid"] = "" #str(uuid.uuid4())
             new_feature["localid"] = ""
             geozone_layer_data.addFeature(new_feature)
@@ -328,8 +329,8 @@ class GeoZONE:
 
         
 
-        if feature["optype"] != "insert":
-            feature["optype"] = "update"
+        if feature["optype"] != "INSERT":
+            feature["optype"] = "UPDATE"
         
         feature["uuid"] = self.generate_uuid4_string(str(feature["localid"]) + str(feature["countryf"]) + str(feature["zonetype"]) + str(feature["disease"]))
         
