@@ -57,19 +57,15 @@ class GeoZoneEditDialog(QDialog):
             "s_swine": "Swines",
             "s_other": "Other species",
             "s_wild": "Wild species",
-            "m_dest": "Official destruction of animal products",
-            "m_surv_w": "Surveillance within the restricted zone",
-            "m_surv_o": "Surveillance outside the restricted zone",
-            "m_trace": "Traceability",
-            "m_stpout": "Stamping out",
-            "m_zoning": "Zoning",
-            "m_movctrl": "Movement control",
-            "m_quarant": "Quarantine",
-            "m_vectctrl": "Vector surveillance",
-            "m_selkill": "Selective killing and disposal",
-            "m_screen": "Screening",
-            "m_vacc": "Vaccination during outbreak(s)"
-
+            "m_stmout": "Stamping out", 
+            "m_mov": "Movement control", 
+            "m_biosec": "Biosecurity", 
+            "m_vactrt": "Vaccination and treatment",
+            "m_animid": "Animal identification", 
+            "m_antrace": "Animal traceability", 
+            "m_ctrace": "Contact tracing", 
+            "m_surv": "Surveillance", 
+            "m_aware": "Awareness campaign"
         }
 
         for field in self.feature.fields():
@@ -125,7 +121,7 @@ class GeoZoneEditDialog(QDialog):
                     combo_box = QComboBox()
                     combo_box.addItems(options)
                     if self.existing_attributes_dict[field.name()] != None:
-                        if field.name() in ["s_avian", "s_bee", "s_bovine", "s_equine", "s_lago", "s_sh_go", "s_swine", "s_other", "s_wild", "m_dest", "m_surv_w", "m_surv_o", "m_trace", "m_stpout", "m_zoning", "m_movctrl", "m_quarant", "m_vectctrl", "m_selkill", "m_screen", "m_vacc"]:
+                        if field.name() in ["s_avian", "s_bee", "s_bovine", "s_equine", "s_lago", "s_sh_go", "s_swine", "s_other", "s_wild", "m_stmout", "m_mov", "m_biosec", "m_vactrt", "m_animid", "m_antrace", "m_ctrace", "m_surv", "m_aware"]:
                             combo_box.setCurrentIndex(self.existing_attributes_dict[field.name()])
                         elif field.name() == "disease":
                             combo_box.setCurrentIndex(int(self.existing_attributes_dict[field.name()]) - 1)
@@ -203,7 +199,7 @@ class GeoZoneEditDialog(QDialog):
 
 
     def _get_combo_box_options(self, field):
-        if field.name() in ["s_avian", "s_bee", "s_bovine", "s_equine", "s_lago", "s_sh_go", "s_swine", "s_other", "s_wild", "m_dest", "m_surv_w", "m_surv_o", "m_trace", "m_stpout", "m_zoning", "m_movctrl", "m_quarant", "m_vectctrl", "m_selkill", "m_screen", "m_vacc"]:
+        if field.name() in ["s_avian", "s_bee", "s_bovine", "s_equine", "s_lago", "s_sh_go", "s_swine", "s_other", "s_wild", "m_stmout", "m_mov", "m_biosec", "m_vactrt", "m_animid", "m_antrace", "m_ctrace", "m_surv", "m_aware"]:
             return ["NO", "YES"]
         elif field.name() == "disease":
             return ["Anthrax", "Bluetongue", "Brucellosis (Brucella abortus)", "Brucellosis (Brucella melitensis)", "Brucellosis (Brucella suis)", "Crimean Congo haemorrhagic fever", "Epizootic haemorrhagic disease", "Equine encephalomyelitis (Eastern)", "Foot and mouth disease", "Heartwater", "Infection with Aujeszky's disease virus", "Infection with Echinococcus granulosus", "Infection with Echinococcus multilocularis", "Infection with rabies virus", "Infection with Rift Valley fever virus", "Infection with rinderpest virus", "Infection with Trichinella spp.", "Japanese encephalitis", "New world screwworm (Cochliomyia hominivorax)", "Old world screwworm (Chrysomya bezziana)", "Paratuberculosis", "Q fever", "Surra (Trypanosoma evansi)", "Tularemia", "West Nile fever", "Bovine anaplasmosis", "Bovine babesiosis", "Bovine genital campylobacteriosis", "Bovine spongiform encephalopathy", "Bovine tuberculosis", "Bovine viral diarrhoea", "Enzootic bovine leukosis", "Haemorrhagic septicaemia", "Infectious bovine rhinotracheitis/infectious pustular vulvovaginitis", "Infection with Mycoplasma mycoides subsp. mycoides SC (Contagious bovine pleuropneumonia)", "Lumpy skin disease", "Theileriosis", "Trichomonosis", "Trypanosomosis (tsetse-transmitted)", "Caprine arthritis/encephalitis", "Contagious agalactia", "Contagious caprine pleuropneumonia", "Infection with Chlamydophila abortus (Enzootic abortion of ewes, ovine chlamydiosis)", "Infection with peste des petits ruminants virus", "Maedi-visna", "Nairobi sheep disease", "Ovine epididymitis (Brucella ovis)", "Salmonellosis (S. abortusovis)", "Scrapie", "Sheep pox and goat pox", "Contagious equine metritis", "Dourine", "Equine encephalomyelitis (Western)", "Equine infectious anaemia", "Equine influenza", "Equine piroplasmosis", "Glanders", "Infection with African horse sickness virus", "Infection with equid herpesvirus-1 (EHV-1)", "Infection with equine arteritis virus", "Venezuelan equine encephalomyelitis", "African swine fever", "Infection with classical swine fever virus", "Nipah virus encephalitis", "Porcine cysticercosis", "Porcine reproductive and respiratory syndrome", "Transmissible gastroenteritis", "Avian chlamydiosis", "Avian infectious bronchitis", "Avian infectious laryngotracheitis", "Avian mycoplasmosis (Mycoplasma gallisepticum)", "Avian mycoplasmosis (Mycoplasma synoviae)", "Duck virus hepatitis", "Fowl typhoid", "Infection with avian influenza viruses", "Infection with influenza A viruses of high pathogenicity in birds other than poultry including wild birds", "Infection with Newcastle disease virus", "Infectious bursal disease (Gumboro disease)", "Pullorum disease", "Turkey rhinotracheitis", "Myxomatosis", "Rabbit haemorrhagic disease", "Infection of honey bees with Melissococcus plutonius (European foulbrood)", "Infection of honey bees with Paenibacillus larvae (American foulbrood)", "Infestation of honey bees with Acarapis woodi", "Infestation of honey bees with Tropilaelaps spp.", "Infestation of honey bees with Varroa spp. (Varroosis)", "Infestation with Aethina tumida (Small hive beetle).", "Camelpox", "Leishmaniosis", "Epizootic haematopoietic necrosis", "Infection with Aphanomyces invadans (epizootic ulcerative syndrome)", "Infection with Gyrodactylus salaris", "Infection with HPR-deleted or HPR0 infectious salmon anaemia virus", "Infection with salmonid alphavirus", "Infectious haematopoietic necrosis", "Koi herpesvirus disease", "Red sea bream iridoviral disease", "Spring viraemia of carp", "Viral haemorrhagic septicaemia", "Infection with abalone herpesvirus", "Infection with Bonamia exitiosa", "Infection with Bonamia ostreae", "Infection with Marteilia refringens", "Infection with Perkinsus marinus", "Infection with Perkinsus olseni", "Infection with Xenohaliotis californiensis", "Infection with Batrachochytrium dendrobatidis", "Infection with ranavirus", "Crayfish plague (Aphanomyces astaci)", "Infection with Yellowhead virus", "Infectious hypodermal and haematopoietic necrosis", "Infectious myonecrosis", "Necrotising hepatopancreatitis", "Taura syndrome", "White spot disease", "White tail disease"]
@@ -241,7 +237,7 @@ class GeoZoneEditDialog(QDialog):
                         edited_attributes[field_name] = qdate.toString("yyyy-MM-dd")
                     else:
                         edited_attributes[field_name] = None
-            elif field_name in ["s_avian", "s_bee", "s_bovine", "s_equine", "s_lago", "s_sh_go", "s_swine", "s_other", "s_wild", "m_dest", "m_surv_w", "m_surv_o", "m_trace", "m_stpout", "m_zoning", "m_movctrl", "m_quarant", "m_vectctrl", "m_selkill", "m_screen", "m_vacc"]:
+            elif field_name in ["s_avian", "s_bee", "s_bovine", "s_equine", "s_lago", "s_sh_go", "s_swine", "s_other", "s_wild", "m_stmout", "m_mov", "m_biosec", "m_vactrt", "m_animid", "m_antrace", "m_ctrace", "m_surv", "m_aware"]:
                 bit_val = 0
                 if line_edit.currentText() == 'YES':
                     bit_val = 1

@@ -73,7 +73,7 @@ class GeoZone:
         for feature in geozone_layer.getFeatures():
             if not feature["optype"]:
                 feature["optype"] = "INSERT"
-                for field in ["s_avian", "s_bee", "s_bovine", "s_equine", "s_lago", "s_sh_go", "s_swine", "s_other", "s_wild", "m_dest", "m_surv_w", "m_surv_o", "m_trace", "m_stpout", "m_zoning", "m_movctrl", "m_quarant", "m_vectctrl", "m_selkill", "m_screen", "m_vacc"]:
+                for field in ["s_avian", "s_bee", "s_bovine", "s_equine", "s_lago", "s_sh_go", "s_swine", "s_other", "s_wild", "m_stmout", "m_mov", "m_biosec", "m_vactrt", "m_animid", "m_antrace", "m_ctrace", "m_surv", "m_aware"]:
                     feature[field] = 0
                 geozone_layer.updateFeature(feature)
         geozone_layer.commitChanges()        
@@ -158,11 +158,9 @@ class GeoZone:
             field_names = ["optype", "uuid", "localid", "geoname", "accuracy",
                         "zonetype", "subtype", "status", "datebegin", "dateend", "disease", "countryf",
                         "s_avian", "s_bee", "s_bovine", "s_equine", "s_lago", "s_sh_go",
-                        "s_swine", "s_other", "s_wild", "m_dest", "m_surv_w", "m_surv_o",
-                        "m_trace", "m_stpout", "m_zoning", "m_movctrl", "m_quarant",
-                        "m_vectctrl", "m_selkill", "m_screen", "m_vacc"]
+                        "s_swine", "s_other", "s_wild", "m_stmout", "m_mov", "m_biosec", "m_vactrt", "m_animid", "m_antrace", "m_ctrace", "m_surv", "m_aware"]
 
-            field_types = [QVariant.String] * 8 + [QVariant.Date, QVariant.Date] + [QVariant.String, QVariant.String] + [QVariant.Int] * 21
+            field_types = [QVariant.String] * 8 + [QVariant.Date, QVariant.Date] + [QVariant.String, QVariant.String] + [QVariant.Int] * 18
             field_lengths = [10, 36, 50, 250, 50, 100, 50, 50, 10, 10, 100, 150]
             i = 0
 
