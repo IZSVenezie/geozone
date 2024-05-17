@@ -24,7 +24,7 @@ class GeoZoneDialog(QDialog):
         self.field3.setCalendarPopup(True)  # Enables the calendar popup
         self.field3.setDate(QDate.currentDate())  # Set default date to current date
 
-        self.label4 = QLabel("Contact *:")
+        self.label4 = QLabel("Namespace *:")
         self.field4 = QLineEdit(self)
 
         self.label5 = QLabel("Constraints:")
@@ -66,7 +66,7 @@ class GeoZoneDialog(QDialog):
             "Title": self.field1.text(),
             "Abstract": self.field2.text(),
             "Date": self.field3.date().toString("yyyy-MM-dd"),
-            "Contact": self.field4.text(),
+            "Namespace": self.field4.text(),
             "Constraints": self.field5.text(),
         }
 
