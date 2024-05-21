@@ -233,7 +233,9 @@ class GeoZone:
 
         # Check if all mandatory fields are correctly set
         all_fields_valid = True
+        country = ""
         for feature in layer.selectedFeatures():
+            country = feature["countryf"]
             for field_name in mandatory_fields:
                 if not feature[field_name] or feature[field_name] in [None, "", "Invalid"]:  # Adjust invalid conditions as needed
                     all_fields_valid = False
@@ -264,7 +266,7 @@ class GeoZone:
             # Assume metadata is saved to a JSON file as part of GeoZoneDialog processing
             metadata_file = os.path.join(directory_path, "metadata.json")
             files_to_zip = [save_path, f"{save_path[:-4]}.shx", f"{save_path[:-4]}.dbf", f"{save_path[:-4]}.prj", f"{save_path[:-4]}.cpg", metadata_file]
-            zip_filename = os.path.join(directory_path, f"GeoZone{current_timestamp}.zip")
+            zip_filename = os.path.join(directory_path, f"{country}_GeoZone{current_timestamp}.zip")
 
             with zipfile.ZipFile(zip_filename, 'w') as zip_file:
                 for file_path in files_to_zip:
