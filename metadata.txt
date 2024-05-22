@@ -2,17 +2,18 @@
 name=GeoZone
 email=gis@izsvenezie.it
 author=Mirco Cazzaro
-qgisMinimumVersion=3.22
+collaborators=Giacomo De Conti, Alberto Tomasin, Rodrigo Macario, Matteo Mazzucato, Federica Sbettega, Nicola Ferrè
+qgisMinimumVersion=3.34
 description=QGIS Plugin for adding and modifying zone data in compliance with the GeoZone schema, facilitating sharing with partners or uploading to a central web repository.
 about=This project is designed to support initiatives conforming to the Terrestrial Code Chapter on Zoning and Compartmentalisation.
-version=0.1
+version=1.0
 
 tracker=https://github.com/IZSVenezie/geozone/issues
 repository=https://github.com/IZSVenezie/geozone
 homepage=https://geozone.izsvenezie.it/
 
 # Tags are comma separated with spaces allowed
-tags=veterinary, diseases, zones, Terrestrial Animal Health Code
+tags=Veterinary, Diseases, Zones, Terrestrial Animal Health Code
 
 category=Plugins
 icon=logo.png
