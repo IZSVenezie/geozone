@@ -146,7 +146,10 @@ class GeoZoneEditDialog(QDialog):
                             position = countryf.index(self.existing_attributes_dict[field.name()])
                             combo_box.setCurrentIndex(position)
                     else:
-                        combo_box.setCurrentIndex(0)
+                        if field.name() == "subtype" or field.name() == "status":
+                            combo_box.setCurrentIndex(len(options) - 1)
+                        else:
+                            combo_box.setCurrentIndex(0)
                     group_layout = self._get_group_layout(field, general_layout, species_layout, measures_layout, group_counters)
                     group_layout.addRow(label, combo_box)
                     self.attribute_widgets[field.name()] = combo_box
