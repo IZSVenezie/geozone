@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QGroupBox, QFormLayout, QDialogButtonBox, QComboBox, QDateEdit, QCheckBox
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QGroupBox, QFormLayout, QDialogButtonBox, QComboBox, QDateEdit, QCheckBox, QScrollArea, QWidget
 from PyQt5.QtCore import Qt
 from qgis.core import QgsVectorLayer
 from qgis.PyQt.QtCore import QDate
@@ -13,7 +13,13 @@ class GeoZoneEditDialog(QDialog):
         self.validate_fields()  # Initial validation check
 
     def init_ui(self):
-        layout = QVBoxLayout(self)
+        main_layout = QVBoxLayout(self)  # This is the main layout for the dialog/window
+
+        self.resize(1450, 1600)
+
+        # Create a QWidget that will contain all the form elements
+        form_widget = QWidget()
+        layout = QVBoxLayout(form_widget)  # Set the layout for the form_widget
 
         self.attribute_widgets = {}
 
@@ -23,13 +29,12 @@ class GeoZoneEditDialog(QDialog):
         general_group_box.setLayout(general_layout)
         layout.addWidget(general_group_box)
 
-        # Group "species" label and fields
+        # Repeat for other groups...
         species_group_box = QGroupBox("Species")
         species_layout = QFormLayout()
         species_group_box.setLayout(species_layout)
         layout.addWidget(species_group_box)
 
-        # Group "measures" label and fields
         measures_group_box = QGroupBox("Measures")
         measures_layout = QFormLayout()
         measures_group_box.setLayout(measures_layout)
@@ -154,12 +159,20 @@ class GeoZoneEditDialog(QDialog):
                     group_layout.addRow(label, combo_box)
                     self.attribute_widgets[field.name()] = combo_box
 
-        # Add button box
+        # Add button box at the bottom
         self.button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.ok_button = self.button_box.button(QDialogButtonBox.Ok)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
         layout.addWidget(self.button_box)
+
+        # Create a QScrollArea and set its widget to form_widget
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)  # Make the scroll area resizable
+        scroll_area.setWidget(form_widget)    # Add form_widget to the scroll area
+
+        # Add the scroll area to the main layout
+        main_layout.addWidget(scroll_area)
 
         # Set up validation connections
         for name, widget in self.attribute_widgets.items():

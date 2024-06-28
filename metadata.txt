@@ -6,7 +6,7 @@ collaborators=Giacomo De Conti, Alberto Tomasin, Rodrigo Macario, Matteo Mazzuca
 qgisMinimumVersion=3.34
 description=QGIS Plugin for adding and modifying zone data in compliance with the GeoZone schema, facilitating sharing with partners or uploading to a central web repository.
 about=This project is designed to support initiatives conforming to the Terrestrial Code Chapter on Zoning and Compartmentalisation.
-version=1.0
+version=1.0.2
 
 tracker=https://github.com/IZSVenezie/geozone/issues
 repository=https://github.com/IZSVenezie/geozone
