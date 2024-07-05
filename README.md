@@ -57,6 +57,15 @@ After saving the GeoZone_Layer and its metadata, the plugin conveniently zips al
 
 - Currently, users may encounter an issue with the visual layout of the attribute editing dialog. This will be addressed in future updates.
 
+## Contributors
+   - [Mirco Cazzaro](https://github.com/mircocazzaro)
+   - Giacomo De Conti
+   - [Alberto Tomasin](https://github.com/therealtoma)
+   - Rodrigo Macario
+   - [Matteo Mazzucato](https://github.com/mmazzucato)
+   - Federica Sbettega
+   - Nicola Ferrè
+
 ## Contributing
 
 We welcome contributions and feedback! If you encounter issues or have suggestions, please submit them through the [issue tracker](https://github.com/yourusername/GeoZone/issues).

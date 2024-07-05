@@ -2,7 +2,6 @@
 name=GeoZone
 email=gis@izsvenezie.it
 author=Mirco Cazzaro
-collaborators=Giacomo De Conti, Alberto Tomasin, Rodrigo Macario, Matteo Mazzucato, Federica Sbettega, Nicola Ferrè
 qgisMinimumVersion=3.34
 description=QGIS Plugin for adding and modifying zone data in compliance with the GeoZone schema, facilitating sharing with partners or uploading to a central web repository.
 about=This project is designed to support initiatives conforming to the Terrestrial Code Chapter on Zoning and Compartmentalisation.
